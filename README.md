@@ -1,6 +1,6 @@
 # Nigerian Fintech llms.txt
 
-A collection of [llms.txt](https://llmstxt.org/) files for Nigerian fintech APIs, designed to help Large Language Models better understand and work with these platforms.
+A collection of [llms.txt](https://llmstxt.org/) files for Nigerian fintech APIs, designed to help Large Language Models (LLMs) better understand and work with these platforms.
 
 ## What is llms.txt?
 
