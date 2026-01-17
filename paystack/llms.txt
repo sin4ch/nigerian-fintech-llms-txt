@@ -1,0 +1,88 @@
+# Paystack Documentation
+
+> Paystack is Africa's leading payments infrastructure provider, enabling businesses to accept payments from customers via cards, bank accounts, mobile money, USSD, QR codes, and bank transfers. This documentation covers integration guides, SDKs, webhooks, and best practices for building payment experiences.
+
+Paystack operates in Nigeria, Ghana, South Africa, Kenya, and Cote d'Ivoire. The platform supports both online and in-person payments through various integration methods including Popup JS, Redirect, Mobile SDKs, and Terminal devices.
+
+Key concepts:
+- All API requests require authentication with secret keys (server-side) or public keys (client-side)
+- Test mode allows development without real transactions using test API keys
+- Webhooks provide real-time notifications for transaction events
+- Transactions should always be verified server-side before delivering value
+
+## Home
+
+- [Paystack Documentation Home](https://paystack.com/docs/): Main entry point with quick start guides for accepting payments, sending money, and identity verification
+
+## Payments
+
+- [Payments Overview](https://paystack.com/docs/payments/): Introduction to accepting payments with Paystack including demos and integration options
+- [Accept Payments](https://paystack.com/docs/payments/accept-payments/): Integration methods including Popup JS, Redirect API, and Mobile SDKs for collecting payments
+- [Verify Payments](https://paystack.com/docs/payments/verify-payments/): How to verify transaction status and understand transaction states (success, failed, abandoned, pending)
+- [Payment Channels](https://paystack.com/docs/payments/payment-channels/): Supported payment methods including cards, mobile money, USSD, QR codes, bank transfers, and Apple Pay
+- [Recurring Charges](https://paystack.com/docs/payments/recurring-charges/): Tokenization and charging saved cards for repeat payments using authorization codes
+- [Subscriptions](https://paystack.com/docs/payments/subscriptions/): Creating plans and managing recurring subscription billing with automatic charges
+- [Split Payments](https://paystack.com/docs/payments/split-payments/): Splitting transaction settlements between main account and subaccounts
+- [Multi-split Payments](https://paystack.com/docs/payments/multi-split-payments/): Advanced splitting with transaction splits across multiple subaccounts
+- [Dedicated Virtual Accounts](https://paystack.com/docs/payments/dedicated-virtual-accounts/): Creating customer-specific bank accounts for receiving transfers (Nigeria & Ghana)
+- [Webhooks](https://paystack.com/docs/payments/webhooks/): Setting up webhook endpoints to receive real-time event notifications for transactions
+- [Refunds](https://paystack.com/docs/payments/refunds/): Initiating partial or full refunds for completed transactions
+- [Manage Disputes](https://paystack.com/docs/payments/manage-disputes/): Handling chargebacks and disputes through the Disputes API
+- [Test Payments](https://paystack.com/docs/payments/test-payments/): Test cards, bank accounts, and mobile money numbers for development
+
+## Terminal
+
+- [Terminal Overview](https://paystack.com/docs/terminal/): In-person payment solutions including Physical Terminal, Virtual Terminal, and Terminal API
+- [Invoice Payments](https://paystack.com/docs/terminal/invoice-payments/): Accepting payment for invoices and orders on Terminal devices
+- [Push Payment Requests](https://paystack.com/docs/terminal/push-payment-requests/): Initiating payment requests from POS systems to Terminal devices
+- [Custom Apps](https://paystack.com/docs/terminal/custom-apps/): Building custom Android applications that run on Paystack Terminal hardware
+- [Virtual Terminal](https://paystack.com/docs/terminal/virtual-terminal/): Using mobile phones as virtual POS devices with WhatsApp notifications
+
+## Transfers
+
+- [Transfers Overview](https://paystack.com/docs/transfers/): Sending money to bank accounts and mobile money wallets
+- [How Transfers Work](https://paystack.com/docs/transfers/how-transfers-work/): Understanding transfer flow, statuses, and processing times
+- [Single Transfers](https://paystack.com/docs/transfers/single-transfers/): Step-by-step guide to sending money to individual recipients
+- [Bulk Transfers](https://paystack.com/docs/transfers/bulk-transfers/): Batch disbursements to multiple recipients in a single request
+- [Creating Transfer Recipients](https://paystack.com/docs/transfers/creating-transfer-recipients/): Setting up beneficiaries with bank account or mobile money details
+- [Managing Transfers](https://paystack.com/docs/transfers/managing-transfers/): Balance management, OTP settings, and transfer controls
+
+## Identity Verification
+
+- [Identity Verification Overview](https://paystack.com/docs/identity-verification/): KYC tools for verifying customer identity and bank details
+- [Verify Account Number](https://paystack.com/docs/identity-verification/verify-account-number/): Confirming bank account ownership before transfers (Nigeria & Ghana)
+- [Validate Customer](https://paystack.com/docs/identity-verification/validate-customer/): BVN and identity verification for Dedicated Virtual Account customers
+- [Resolve Card BIN](https://paystack.com/docs/identity-verification/resolve-card-bin/): Getting card information from the first 6 digits of a card number
+
+## Developer Tools
+
+- [Developer Tools Overview](https://paystack.com/docs/developer-tools/): SDKs, libraries, and tools for Paystack integration
+- [InlineJS](https://paystack.com/docs/developer-tools/inlinejs/): JavaScript SDK for web payment integration with Popup checkout
+- [Flutter SDK](https://paystack.com/docs/developer-tools/flutter-sdk/): Cross-platform mobile SDK for Flutter applications (Beta)
+- [iOS SDK](https://paystack.com/docs/developer-tools/ios-sdk/): Native iOS SDK for accepting payments in Swift/Objective-C apps (Beta)
+- [Android SDK](https://paystack.com/docs/developer-tools/android-sdk/): Native Android SDK for accepting payments in Kotlin/Java apps
+
+## Guides
+
+- [Guides Overview](https://paystack.com/docs/guides/): Step-by-step tutorials for integrating Paystack with various frameworks
+- [Accept Payments on your Vue App](https://paystack.com/docs/guides/accept_payments_on_your_vue_app/): Vue.js integration tutorial with Paystack Popup
+- [Accept Payments on your React App](https://paystack.com/docs/guides/accept_payments_on_your_react_app/): React integration tutorial with component examples
+- [Accept Payments on your Android App](https://paystack.com/docs/guides/accept_payments_on_your_android_app/): Native Android integration with the Paystack Android SDK
+- [Accept Payments in your Flutter App](https://paystack.com/docs/guides/accept-payments-in-your-flutter-app/): Flutter integration guide with the Paystack Flutter SDK
+- [Using the Paystack Checkout in a Mobile WebView](https://paystack.com/docs/guides/using_the_paystack_checkout_in_a_mobile_webview/): Embedding Paystack checkout in mobile app WebViews
+- [Migrating from InlineJS V1 to V2](https://paystack.com/docs/guides/migrating-from-inlinejs-v1-to-v2/): Upgrading from legacy Popup to InlineJS V2
+
+## Libraries and Plugins
+
+- [Libraries and Plugins Overview](https://paystack.com/docs/libraries-and-plugins/): Official and community-maintained integrations
+- [Libraries](https://paystack.com/docs/libraries-and-plugins/libraries/): Server-side libraries for PHP, Python, Node.js, Java, .NET, Ruby, and more
+- [Plugins](https://paystack.com/docs/libraries-and-plugins/plugins/): E-commerce platform plugins for WordPress, WooCommerce, Shopify, Magento, PrestaShop, Joomla, BigCommerce, Xero, and Ecwid
+
+## Optional
+
+- [API Reference](https://paystack.com/docs/api/): Complete REST API documentation with all endpoints, parameters, and responses
+- [API Changelog](https://paystack.com/docs/changelog/api/): Latest API updates, new features, deprecations, and breaking changes
+- [Paystack CLI](https://www.npmjs.com/package/@paystack-oss/dev-cli): Command-line tool for testing webhooks and managing integrations
+- [Payslack Community](https://join.slack.com/t/payslack/shared_invite/zt-338biukg0-B1KJaBqvEtKWLp7yOUL6sA): Developer community on Slack for questions and discussions
+- [Paystack Support](https://support.paystack.com/): Help center with FAQs and support resources
+- [PaystackOSS on GitHub](https://github.com/PaystackOSS/): Sample projects and open-source demos

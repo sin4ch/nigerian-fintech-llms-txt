@@ -1,0 +1,155 @@
+# Mono Banking API Documentation
+
+> Mono is an African open banking platform that provides APIs for accessing financial data, initiating payments, and verifying identities. Mono enables fintechs, lenders, and businesses to securely connect to users' bank accounts across Nigeria, Ghana, Kenya, and South Africa.
+
+Important notes:
+
+- All API requests require authentication using the `mono-sec-key` header with your App secret key
+- Mono provides two environments: Sandbox (free testing) and Live (production with wallet funding required)
+- Currency values in API responses are in the lowest denomination (NGN: kobo, GHC: pesewa, KSH/ZAR: cents)
+- The Mono Connect Widget is used to securely link user accounts via SDK or Connect Link
+
+## Getting Started
+
+- [Definitions](https://docs.mono.co/docs/definitions): Key terms including Account ID, Token, Public Key, Secret Key, and Enrolment process
+- [Use Cases](https://docs.mono.co/docs/use-cases): Common implementation scenarios for lending, banking, payments, wealth management, and accounting
+- [Creating an App](https://docs.mono.co/docs/create-app): How to create applications on the Mono dashboard and retrieve API keys
+- [Environments](https://docs.mono.co/docs/environments): Understanding Sandbox vs Live environments and switching between them
+- [Sandbox](https://docs.mono.co/docs/sandbox): Test credentials and sample data for development without affecting real accounts
+- [Webhooks](https://docs.mono.co/docs/webhooks): Configure webhook URLs to receive real-time transaction and account update notifications
+- [Go Live Checklist](https://docs.mono.co/docs/go-live): Requirements and steps to transition from sandbox to production
+- [Quick Start](https://docs.mono.co/docs/quickstart): Step-by-step guide to get your first integration running
+- [Errors](https://docs.mono.co/docs/errors): Common error codes, their meanings, and how to handle them
+- [FAQs](https://docs.mono.co/docs/faqs): Frequently asked questions about Mono APIs and integration
+
+## Customer Management
+
+- [Customer Overview](https://docs.mono.co/docs/customers): Managing individual and business customers, linking accounts, and tracking transactions
+
+## Financial Data (Mono Connect)
+
+- [Overview](https://docs.mono.co/docs/financial-data/overview): Introduction to Mono Connect for accessing bank account data with user permission
+
+### Integration Guides
+
+- [SDK Integration Guide](https://docs.mono.co/docs/financial-data/integration-guide): Step-by-step guide to integrate Mono Connect SDK into your application
+- [Connect Link Guide](https://docs.mono.co/docs/financial-data/connect-link): Use Mono-hosted links for account linking without SDK integration
+- [Reauth Link Guide](https://docs.mono.co/docs/financial-data/reauth-link): Re-authenticate expired or disconnected account sessions
+- [SDK Config Guide](https://docs.mono.co/docs/financial-data/sdk): Advanced SDK configuration options and customization
+
+### Real-time Data
+
+- [Real-time Data](https://docs.mono.co/docs/financial-data/realtime-data): Manually refresh and retrieve current balance and transaction data from linked accounts
+
+### Partners API Guide
+
+- [Partners API Overview](https://docs.mono.co/docs/financial-data/partners-api-guide/overview): Direct API integration without the Connect Widget for custom implementations
+- [Partners Integration Guide](https://docs.mono.co/docs/financial-data/partners-api-guide/integration-guide): Detailed steps for Partners API implementation
+- [Reauthorisation Guide](https://docs.mono.co/docs/financial-data/partners-api-guide/reauth-guide): Handle session expiry and re-authentication flows
+- [Sandbox Guide](https://docs.mono.co/docs/financial-data/partners-api-guide/sandbox-guide): Testing Partners API with sandbox credentials
+
+### Data Enrichment
+
+- [Enrichment Overview](https://docs.mono.co/docs/financial-data/enrichment/overview): AI-powered transaction analysis and categorization features
+- [Transaction Categorisation](https://docs.mono.co/docs/financial-data/enrichment/transaction-categorisation): Automatically categorize transactions into spending categories
+- [Transaction Metadata](https://docs.mono.co/docs/financial-data/enrichment/transaction-metadata): Extract merchant names, logos, and additional transaction context
+- [Statement Insights](https://docs.mono.co/docs/financial-data/enrichment/statement-insights): Generate financial health insights from bank statements
+
+### Endpoints
+
+- [Authorization](https://docs.mono.co/docs/financial-data/authorization): Exchange authorization codes for permanent Account IDs
+- [Account Information](https://docs.mono.co/docs/financial-data/account-information): Retrieve account details including type, currency, balance, and holder information
+- [Transactions](https://docs.mono.co/docs/financial-data/transactions): Fetch transaction history with filtering by date, type, and narration
+- [Statements](https://docs.mono.co/docs/financial-data/statements): Generate and download bank statements in PDF or JSON format
+- [Identity](https://docs.mono.co/docs/financial-data/identity): Retrieve verified user identity information for KYC purposes
+- [Income](https://docs.mono.co/docs/financial-data/income): Analyze income patterns including monthly average, salary estimates, and income sources
+- [Assets](https://docs.mono.co/docs/financial-data/assets): Access investment portfolio holdings across linked accounts
+- [Earnings](https://docs.mono.co/docs/financial-data/earnings): Retrieve earnings and returns on investment assets
+- [Credit Worthiness](https://docs.mono.co/docs/financial-data/credit-worthiness): Generate credit scores and affordability assessments
+
+### Webhook Events
+
+- [Webhook Introduction](https://docs.mono.co/docs/financial-data/webhook-introduction): Overview of Financial Data webhook events and payload structure
+- [Auth (Connection)](https://docs.mono.co/docs/financial-data/auth-connection): Webhook triggered when a user successfully links their account
+- [Account Update (Balance)](https://docs.mono.co/docs/financial-data/account-update): Webhook triggered when account data is refreshed
+- [Unlink (Disconnection)](https://docs.mono.co/docs/financial-data/unlink): Webhook triggered when a user disconnects their account
+
+## Payments
+
+- [Overview](https://docs.mono.co/docs/payments/overview): Introduction to Mono Payment APIs for direct bank debits and transfers
+- [Payouts](https://docs.mono.co/docs/payments/payouts): Send money from your Mono wallet to bank accounts
+
+### One-time DirectPay
+
+- [One-time Overview](https://docs.mono.co/docs/payments/onetime/overview): Single charge payments directly from customer bank accounts
+- [Integration Guide](https://docs.mono.co/docs/payments/onetime/integration-guide): Step-by-step DirectPay implementation
+- [SDK Guide](https://docs.mono.co/docs/payments/sdk-guide): Integrate DirectPay using Mono SDKs
+- [Webhook Events](https://docs.mono.co/docs/payments/onetime/webhook-events): Payment status notifications and event handling
+- [Payment Status](https://docs.mono.co/docs/payments/onetime/payment-status): Understanding payment states and verification
+
+### Recurring Direct Debit
+
+- [Direct Debit Overview](https://docs.mono.co/docs/payments/direct-debit/overview): Set up mandates for recurring and subscription payments
+- [Integration Guide](https://docs.mono.co/docs/payments/direct-debit/integration-guide): Complete Direct Debit implementation walkthrough
+- [Step 1: Create Customers](https://docs.mono.co/docs/payments/direct-debit/integration-guide-create-customers): Register customers before mandate setup
+- [Step 2: Mandate Setup Explained](https://docs.mono.co/docs/payments/direct-debit/mandate-setup-explained): Understanding mandate types and authorization
+- [Step 2a: Variable Mandate Setup](https://docs.mono.co/docs/payments/direct-debit/mandate-setup-variable): Flexible debit amounts within a total limit
+- [Step 2b: Fixed Mandate Setup](https://docs.mono.co/docs/payments/direct-debit/mandate-setup-fixed): Fixed recurring debit amounts
+- [Step 3: Debit Account](https://docs.mono.co/docs/payments/direct-debit/debit-an-account): Execute debits against approved mandates
+- [Global Standing Mandate](https://docs.mono.co/docs/payments/direct-debit/global-standing-mandate): GSM mandate type for certain banks
+- [Mandate Biometrics Verification](https://docs.mono.co/docs/payments/direct-debit/mandate-biometric-verification): Enhanced security with biometric authorization
+- [Direct Debit Webhook Events](https://docs.mono.co/docs/payments/direct-debit/webhook-events): Mandate and debit status notifications
+
+### Split Payments
+
+- [Split Payments](https://docs.mono.co/docs/payments/split-payments): Allocate payments across multiple accounts in a single transaction
+
+### WhatsApp Payment (Owo)
+
+- [WhatsApp Payment Overview](https://docs.mono.co/docs/whatsapp-payment/overview): Collect payments via WhatsApp using Owo Direct Charge
+- [Integration Guide](https://docs.mono.co/docs/whatsapp-payment/integration-guide): Implement WhatsApp-based payment collection
+- [Webhook Events](https://docs.mono.co/docs/whatsapp-payment/webhook-events): WhatsApp payment status notifications
+
+### Disburse
+
+- [Disburse Overview](https://docs.mono.co/docs/disburse/overview): Bulk and scheduled payouts to bank accounts
+- [Integration Guide](https://docs.mono.co/docs/disburse/integration-guide): Implement instant and scheduled disbursements
+- [Webhook Events](https://docs.mono.co/docs/disburse/webhook-events): Disbursement status notifications
+
+## Identity Verification (Lookup)
+
+- [Overview](https://docs.mono.co/docs/lookup/overview): Verify and validate user and business data for KYC compliance
+
+### Lookup Integration Guides
+
+- [BVN iGree](https://docs.mono.co/docs/lookup/bvn-igree): Bank Verification Number lookup with consent-based verification
+- [CAC Lookup](https://docs.mono.co/docs/lookup/cac-lookup): Verify Nigerian business registration with Corporate Affairs Commission
+- [Account Number](https://docs.mono.co/docs/lookup/account-number): Validate and verify bank account numbers
+- [House Address Verification](https://docs.mono.co/docs/lookup/house-address): Confirm physical address validity and ownership
+- [Int'l Passport Lookup](https://docs.mono.co/docs/lookup/intl-passport): Verify international passport documents
+- [TIN Lookup](https://docs.mono.co/docs/lookup/tin-lookup): Tax Identification Number verification
+- [Driver's License Lookup](https://docs.mono.co/docs/lookup/drivers-license): Verify driver's license information
+- [NIN Lookup](https://docs.mono.co/docs/lookup/nin-lookup): National Identification Number verification
+- [Credit History Lookup](https://docs.mono.co/docs/lookup/credit-history-lookup): Retrieve credit bureau reports using BVN
+- [Mashup Lookup](https://docs.mono.co/docs/lookup/mashup): Combined NIN, BVN, and DOB verification in one API call
+
+### Prove (eKYC)
+
+- [Prove Overview](https://docs.mono.co/docs/lookup/prove/overview): Multi-tier KYC verification with facial recognition
+- [Prove Integration Guide](https://docs.mono.co/docs/lookup/prove/integration-guide): Implement tiered identity verification flows
+
+## Developer Tools
+
+- [Brand Assets](https://docs.mono.co/docs/brand-assets): Mono logos, icons, and branding guidelines for your integration
+- [Libraries](https://docs.mono.co/docs/libraries): Server-side libraries for Node.js, Python, PHP, Ruby, and more
+- [SDKs](https://docs.mono.co/docs/sdks): Client-side SDKs for Web, React Native, iOS, Android, and Flutter
+- [Postman Collection](https://docs.mono.co/docs/postman): Pre-configured Postman collection for testing Mono APIs
+
+## Optional
+
+- [API Reference](https://docs.mono.co/api): Complete API endpoint documentation with request/response examples
+- [Coverage](https://docs.mono.co/docs/coverage): Supported financial institutions across Nigeria, Ghana, Kenya, and South Africa
+- [Changelog](https://docs.mono.co/docs/changelog): API updates, new features, and breaking changes
+- [API Status](https://status.mono.co): Real-time status of Mono APIs and services
+- [Support Center](https://support.mono.co/en): Help articles, guides, and customer support
+- [Developer Community](https://devwithmono.slack.com): Join the Mono developer Slack community
