@@ -1,0 +1,1022 @@
+# OPay
+
+> OPay is a leading Nigerian fintech company providing secure, PCI-compliant RESTful payment APIs for accepting and processing payments. OPay offers multiple payment methods including card payments (3DS), bank transfers, USSD, bank account debits, OPay wallet, and reference code payments. The platform operates in Nigeria and Egypt, supporting NGN and USD currencies.
+
+OPay provides comprehensive payment solutions for merchants through:
+- **Express Checkout**: Hosted payment page (OPay Cashier) for seamless integration
+- **Server-Side APIs**: Full control over checkout UI/UX with direct API integration
+- **Mobile SDKs**: Native SDKs for Android, iOS, Flutter, and React Native
+- **E-Commerce Plugins**: Ready-made plugins for WooCommerce, Shopify, Magento
+
+Key Integration Notes:
+- All API requests must be made over HTTPS
+- Authentication uses either Public Key (Bearer token) or HMAC-SHA512 signature
+- Amounts are in minor units (100 kobos = 1 NGN, 100 cents = 1 USD)
+- Sandbox environment available for testing before production
+- Webhooks provide real-time transaction status updates
+
+## Docs
+
+- [OPay Documentation Home](https://documentation.opaycheckout.com): Main developer documentation portal with guides and API references
+- [Getting Started](https://documentation.opaycheckout.com/getting-started): Account registration and merchant dashboard setup guide
+- [Payment Authentication](https://documentation.opaycheckout.com/payment-authentication): API keys, public key auth, and signature authentication methods
+- [API Signature Calculator](https://documentation.opaycheckout.com/api-signature): HMAC-SHA512 signature generation for API calls
+- [Callback Signature](https://documentation.opaycheckout.com/callback-signature): Verifying webhook notification signatures
+- [Regional Payment Methods](https://documentation.opaycheckout.com/regional-payment-methods): Supported countries, currencies, and payment methods
+- [Error Codes](https://documentation.opaycheckout.com/error-codes): Complete list of OPay and acquirer bank error codes
+- [End to End Testing](https://documentation.opaycheckout.com/end-to-end-testing): Sandbox test cards and test data for all payment methods
+
+## Express Checkout
+
+- [Express Checkout Overview](https://documentation.opaycheckout.com/checkout-overview): OPay Cashier hosted payment page integration guide
+- [Cashier Create Payment](https://documentation.opaycheckout.com/cashier-create): API to create payment sessions and redirect to OPay Cashier
+
+## Server Side APIs
+
+- [Server APIs Overview](https://documentation.opaycheckout.com/server-apis-overview): Introduction to building custom checkout with server-to-server APIs
+- [3DS Card Payment](https://documentation.opaycheckout.com/3DS-API): 3D Secure card payment integration with redirect flow
+- [Bank Transfer Payment](https://documentation.opaycheckout.com/bank-transfer): Generate virtual account for bank transfer payments
+- [Bank USSD Payment](https://documentation.opaycheckout.com/bank-Ussd): USSD-based payment integration
+- [Bank Account Payment](https://documentation.opaycheckout.com/bank-account): Direct bank account debit with OTP/3DS verification
+- [POS Payment](https://documentation.opaycheckout.com/pos): Point of Sale terminal payment integration
+- [Reference Code Payment](https://documentation.opaycheckout.com/reference-code): Generate reference codes for offline payments
+- [OPay Wallet QR Payment](https://documentation.opaycheckout.com/opay-wallet-payment): QR code payment via OPay Wallet
+- [Query Payment Status](https://documentation.opaycheckout.com/query-payment-status): Retrieve payment transaction status
+- [Cancel Payment](https://documentation.opaycheckout.com/cashier-close): Cancel pending payment transactions
+- [Refund Payment](https://documentation.opaycheckout.com/payment-refund): Process full or partial refunds
+- [Query Refund Status](https://documentation.opaycheckout.com/payment-refund-status): Check refund transaction status
+- [Send OTP](https://documentation.opaycheckout.com/send-otp): Trigger OTP for payment verification
+- [Input OTP](https://documentation.opaycheckout.com/input-otp): Submit OTP for payment authorization
+- [Input PIN](https://documentation.opaycheckout.com/input-pin): Submit PIN for payment authorization
+
+## Mobile SDKs
+
+- [Android SDK](https://documentation.opaycheckout.com/android-sdk): Native Android SDK integration guide with Java/Kotlin examples
+- [iOS SDK](https://documentation.opaycheckout.com/ios-sdk): Native iOS SDK integration guide
+- [Flutter SDK](https://documentation.opaycheckout.com/flutter-sdk): Flutter plugin for cross-platform mobile apps
+- [React Native SDK](https://documentation.opaycheckout.com/react-native-sdk): React Native module for mobile apps
+
+## Webhooks
+
+- [Payment Notifications Callbacks](https://documentation.opaycheckout.com/payment-notifications-callbacks): Setting up webhook endpoints for transaction status updates
+
+## E-Commerce Plugins
+
+- [WooCommerce Plugin](https://documentation.opaycheckout.com/woocommerce-plugin): WordPress/WooCommerce payment gateway plugin
+
+## Offline Payments
+
+- [Offline Payments Overview](https://documentation.opayweb.com/doc/offline/overview.html): POS and offline payment integration documentation
+- [Offline API Basics](https://documentation.opayweb.com/doc/offline/api-basics.html): Request methods, common parameters, and response codes
+- [Offline Authentication](https://documentation.opayweb.com/doc/offline/authentication.html): RSA encryption and signing for offline APIs
+- [POS Integration API](https://documentation.opayweb.com/doc/offline/pos-api.html): API-based POS terminal integration
+- [Query Balance](https://documentation.opayweb.com/doc/offline/query-account-balance.html): Check merchant account balance
+
+## Optional
+
+- [OPay Merchant Dashboard](https://merchant.opaycheckout.com): Merchant portal for account management and API keys
+- [OPay Support](https://support.opaycheckout.com/support/ticket): Contact OPay support team
+- [OPay Website](https://opayweb.com): Main OPay corporate website
+
+---
+
+# API Reference
+
+> Complete API reference for OPay payment gateway integration. OPay provides RESTful APIs for accepting payments via cards, bank transfers, USSD, bank accounts, OPay wallet, and reference codes. All APIs use JSON format, HTTPS, and support both sandbox and production environments.
+
+## API Environments
+
+| Environment | Base URL |
+|-------------|----------|
+| Sandbox (Testing) | `https://testapi.opaycheckout.com` |
+| Production (Live) | `https://liveapi.opaycheckout.com` |
+| Offline Payments | `https://payapi.opayweb.com` |
+
+## Authentication
+
+OPay uses two authentication methods depending on the API endpoint:
+
+### 1. Public Key Authentication
+Used for: Cashier Create Payment API
+
+```
+Authorization: Bearer {PublicKey}
+MerchantId: {YourMerchantId}
+```
+
+### 2. Signature Authentication (HMAC-SHA512)
+Used for: All other payment APIs (status queries, refunds, server-side payments)
+
+```
+Authorization: Bearer {HMAC-SHA512-Signature}
+MerchantId: {YourMerchantId}
+```
+
+**Signature Generation:**
+1. Create JSON payload with alphabetically sorted keys
+2. Compute HMAC-SHA512 of the JSON string using your Secret Key
+3. Use the hex-encoded result as the signature
+
+**PHP Example:**
+```php
+$signature = hash_hmac('sha512', json_encode($data), $secretKey);
+```
+
+**JavaScript Example:**
+```javascript
+const crypto = require('crypto');
+const signature = crypto.createHmac('sha512', secretKey)
+    .update(JSON.stringify(data))
+    .digest('hex');
+```
+
+**Java Example:**
+```java
+Mac mac = Mac.getInstance("HmacSHA512");
+SecretKeySpec secretKey = new SecretKeySpec(privateKey.getBytes(), "HmacSHA512");
+mac.init(secretKey);
+byte[] hmacData = mac.doFinal(jsonPayload.getBytes());
+String signature = Hex.encodeHexString(hmacData);
+```
+
+---
+
+## Express Checkout API
+
+### Create Cashier Payment
+
+Creates a payment session and returns a URL to redirect customers to OPay's hosted checkout page.
+
+**Endpoint:** `POST /api/v1/international/cashier/create`
+
+**Authentication:** Public Key
+
+**Request Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer {PublicKey}
+MerchantId: {YourMerchantId}
+```
+
+**Request Body:**
+```json
+{
+  "reference": "unique-order-123",
+  "country": "NG",
+  "amount": {
+    "total": 10000,
+    "currency": "NGN"
+  },
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "returnUrl": "https://yoursite.com/payment/success",
+  "callbackUrl": "https://yoursite.com/webhook/opay",
+  "cancelUrl": "https://yoursite.com/payment/cancelled",
+  "payMethod": "BankCard",
+  "expireAt": 30,
+  "userInfo": {
+    "userId": "user123",
+    "userName": "John Doe",
+    "userEmail": "john@example.com",
+    "userMobile": "+2348012345678"
+  }
+}
+```
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| reference | String | Yes | Unique merchant order number |
+| country | String | Yes | Country code: `NG` (Nigeria) |
+| amount.total | Integer | Yes | Amount in minor units (kobos) |
+| amount.currency | String | Yes | Currency: `NGN` or `USD` |
+| product.name | String | Yes | Product name |
+| product.description | String | Yes | Product description |
+| returnUrl | String | Yes | Redirect URL after payment completion |
+| callbackUrl | String | No | Webhook URL for payment notifications |
+| cancelUrl | String | No | Redirect URL if payment cancelled |
+| payMethod | String | No | Preferred payment method (see Payment Methods) |
+| expireAt | Integer | No | Expiration time in minutes (default: 30) |
+| userInfo.userId | String | No | Customer user ID |
+| userInfo.userName | String | No | Customer name |
+| userInfo.userEmail | String | No | Customer email |
+| userInfo.userMobile | String | No | Customer phone |
+| displayName | String | No | Sub-merchant name to display |
+| evokeOpay | Boolean | No | Whether to open OPay app for payment |
+| customerVisitSource | String | No | `IOS`, `ANDROID`, or `BROWSER` |
+
+**Success Response:**
+```json
+{
+  "code": "00000",
+  "message": "SUCCESSFUL",
+  "data": {
+    "reference": "unique-order-123",
+    "orderNo": "211009140896553163",
+    "cashierUrl": "https://sandboxcashier.opaycheckout.com/...",
+    "status": "INITIAL",
+    "amount": {
+      "total": 10000,
+      "currency": "NGN"
+    },
+    "vat": {
+      "total": 0,
+      "currency": "NGN"
+    }
+  }
+}
+```
+
+---
+
+## Server-Side Payment APIs
+
+### 3DS Card Payment
+
+Process card payments with 3D Secure authentication.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "order-456",
+  "country": "NG",
+  "amount": {
+    "total": 50000,
+    "currency": "NGN"
+  },
+  "bankcard": {
+    "cardNumber": "5061460410121111104",
+    "expiryMonth": "12",
+    "expiryYear": "50",
+    "cvv": "560",
+    "cardHolderName": "JOHN DOE",
+    "enable3DS": true
+  },
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "payMethod": "BankCard",
+  "returnUrl": "https://yoursite.com/payment/complete",
+  "callbackUrl": "https://yoursite.com/webhook/opay"
+}
+```
+
+**Card Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| bankcard.cardNumber | String | Yes | Card number |
+| bankcard.expiryMonth | String | Yes | Expiry month (01-12) |
+| bankcard.expiryYear | String | Yes | Expiry year (2 digits: 25, 26...) |
+| bankcard.cvv | String | Yes | CVV/CVC code |
+| bankcard.cardHolderName | String | Yes | Cardholder name |
+| bankcard.enable3DS | Boolean | Yes | Must be `true` |
+
+**For USD Payments, add billingInfo:**
+```json
+{
+  "billingInfo": {
+    "country": "US",
+    "postalCode": "10001",
+    "state": "New York",
+    "city": "New York",
+    "address": "123 Main St",
+    "firstName": "John",
+    "lastName": "Doe",
+    "mobileNumber": "+1234567890",
+    "email": "john@example.com"
+  }
+}
+```
+
+**Success Response:**
+```json
+{
+  "code": "00000",
+  "message": "SUCCESSFUL",
+  "data": {
+    "reference": "order-456",
+    "orderNo": "211004140885521681",
+    "status": "PENDING",
+    "nextAction": {
+      "actionType": "REDIRECT_3DS",
+      "redirectUrl": "https://testapi.opaycheckout.com/api/v1/international/transaction/3ds/..."
+    },
+    "amount": {
+      "total": 50000,
+      "currency": "NGN"
+    }
+  }
+}
+```
+
+---
+
+### Bank Transfer Payment
+
+Generate a virtual bank account for customers to transfer to.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "transfer-789",
+  "country": "NG",
+  "amount": {
+    "total": 100000,
+    "currency": "NGN"
+  },
+  "payMethod": "BankTransfer",
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "callbackUrl": "https://yoursite.com/webhook/opay",
+  "customerName": "John Doe",
+  "userInfo": {
+    "userId": "user123",
+    "userName": "John Doe",
+    "userEmail": "john@example.com",
+    "userMobile": "+2348012345678"
+  }
+}
+```
+
+**Success Response:**
+```json
+{
+  "code": "00000",
+  "message": "SUCCESSFUL",
+  "data": {
+    "reference": "transfer-789",
+    "orderNo": "220110144664537659",
+    "status": "PENDING",
+    "nextAction": {
+      "actionType": "TRANSFER_ACCOUNT",
+      "transferAccountNumber": "7827845341",
+      "transferBankName": "WEMA BANK",
+      "expiredTimestamp": 1641773850
+    },
+    "amount": {
+      "total": 100000,
+      "currency": "NGN"
+    }
+  }
+}
+```
+
+---
+
+### Bank USSD Payment
+
+Initialize USSD-based payment.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "ussd-order-123",
+  "country": "NG",
+  "amount": {
+    "total": 25000,
+    "currency": "NGN"
+  },
+  "payMethod": "BankUssd",
+  "bankCode": "058",
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "callbackUrl": "https://yoursite.com/webhook/opay"
+}
+```
+
+---
+
+### Bank Account Payment
+
+Direct debit from customer's bank account with OTP/3DS verification.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "bank-debit-123",
+  "country": "NG",
+  "amount": {
+    "total": 75000,
+    "currency": "NGN"
+  },
+  "payMethod": "BankAccount",
+  "bankAccount": {
+    "bankCode": "033",
+    "accountNumber": "2215381184",
+    "bvn": "123456789",
+    "dobDay": "05",
+    "dobMonth": "01",
+    "dobYear": "1990",
+    "phoneNumber": "08012345678"
+  },
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "callbackUrl": "https://yoursite.com/webhook/opay"
+}
+```
+
+---
+
+### Reference Code Payment
+
+Generate a reference code for offline/POS payments.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "ref-code-123",
+  "country": "NG",
+  "amount": {
+    "total": 50000,
+    "currency": "NGN"
+  },
+  "payMethod": "ReferenceCode",
+  "expireAt": 60,
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "callbackUrl": "https://yoursite.com/webhook/opay",
+  "userInfo": {
+    "userName": "John Doe",
+    "userEmail": "john@example.com",
+    "userMobile": "+2348012345678"
+  }
+}
+```
+
+**Success Response includes:**
+```json
+{
+  "data": {
+    "referenceCode": "123456789",
+    "orderNo": "220110144664537659"
+  }
+}
+```
+
+---
+
+### OPay Wallet QR Payment
+
+Generate QR code for OPay Wallet payments.
+
+**Endpoint:** `POST /api/v1/international/payment/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "qr-payment-123",
+  "country": "NG",
+  "amount": {
+    "total": 30000,
+    "currency": "NGN"
+  },
+  "payMethod": "OpayWalletNgQR",
+  "product": {
+    "name": "Product Name",
+    "description": "Product description"
+  },
+  "callbackUrl": "https://yoursite.com/webhook/opay"
+}
+```
+
+---
+
+## Payment Status & Management APIs
+
+### Query Payment Status
+
+Retrieve the current status of a payment transaction.
+
+**Endpoint:** `POST /api/v1/international/cashier/status`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "order-123",
+  "country": "NG"
+}
+```
+
+Or query by OPay order number:
+```json
+{
+  "orderNo": "211009140896593010",
+  "country": "NG"
+}
+```
+
+**Response:**
+```json
+{
+  "code": "00000",
+  "message": "SUCCESSFUL",
+  "data": {
+    "reference": "order-123",
+    "orderNo": "211009140896593010",
+    "status": "SUCCESS",
+    "amount": {
+      "total": 10000,
+      "currency": "NGN"
+    },
+    "vat": {
+      "total": 0,
+      "currency": "NGN"
+    },
+    "createTime": 1633788085000
+  }
+}
+```
+
+**Payment Status Values:**
+
+| Status | Description |
+|--------|-------------|
+| INITIAL | Payment created, awaiting customer action |
+| PENDING | Payment in progress |
+| SUCCESS | Payment completed successfully |
+| FAIL | Payment failed |
+| CLOSE | Payment closed/cancelled |
+
+---
+
+### Cancel Payment
+
+Cancel a pending payment transaction.
+
+**Endpoint:** `POST /api/v1/international/cashier/close`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "order-123",
+  "country": "NG"
+}
+```
+
+---
+
+### Refund Payment
+
+Process a refund for a completed payment.
+
+**Endpoint:** `POST /api/v1/international/payment/refund/create`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "refund-001",
+  "originalReference": "order-123",
+  "country": "NG",
+  "amount": {
+    "total": 10000,
+    "currency": "NGN"
+  },
+  "refundWay": "Original",
+  "callbackUrl": "https://yoursite.com/webhook/refund",
+  "refundReason": "Customer requested refund"
+}
+```
+
+**Refund Ways by Payment Method:**
+
+| Payment Method | Refund Way |
+|----------------|------------|
+| BankAccount | Original |
+| BankTransfer | BankAccount |
+| BankUssd | BankAccount |
+| OpayWallet | Original |
+| BankCard | BankAccount |
+
+**For BankAccount refunds, add receiver info:**
+```json
+{
+  "receiver": {
+    "bankCode": "033",
+    "bankAccountNo": "1234567890"
+  }
+}
+```
+
+---
+
+### Query Refund Status
+
+Check the status of a refund transaction.
+
+**Endpoint:** `POST /api/v1/international/payment/refund/status`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "reference": "refund-001",
+  "country": "NG"
+}
+```
+
+---
+
+## OTP & PIN Verification APIs
+
+### Send OTP
+
+Trigger OTP sending for payment verification.
+
+**Endpoint:** `POST /api/v1/international/payment/otp/send`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "orderNo": "220207140591969743",
+  "country": "NG"
+}
+```
+
+---
+
+### Input OTP
+
+Submit OTP for payment authorization.
+
+**Endpoint:** `POST /api/v1/international/payment/otp/input`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "orderNo": "220207140591969743",
+  "country": "NG",
+  "otp": "123456"
+}
+```
+
+---
+
+### Input PIN
+
+Submit PIN for payment authorization.
+
+**Endpoint:** `POST /api/v1/international/payment/pin/input`
+
+**Authentication:** Signature (HMAC-SHA512)
+
+**Request Body:**
+```json
+{
+  "orderNo": "220207140591969743",
+  "country": "NG",
+  "pin": "1234"
+}
+```
+
+---
+
+## Webhook Notifications
+
+OPay sends POST requests to your callback URL when transaction status changes.
+
+### Webhook Payload Structure
+
+```json
+{
+  "payload": {
+    "amount": "49160",
+    "channel": "Web",
+    "country": "NG",
+    "currency": "NGN",
+    "displayedFailure": "",
+    "fee": "737",
+    "feeCurrency": "NGN",
+    "instrumentType": "BankCard",
+    "reference": "order-123",
+    "refunded": false,
+    "status": "SUCCESS",
+    "timestamp": "2022-05-07T06:20:46Z",
+    "token": "220507145660712931829",
+    "transactionId": "220507145660712931829",
+    "updated_at": "2022-05-07T07:20:46Z"
+  },
+  "sha512": "9f605d69f04e94172875dc156537071...",
+  "type": "transaction-status"
+}
+```
+
+### Verifying Webhook Signature
+
+1. Extract the `payload` object from the webhook
+2. Compute HMAC-SHA512 of the payload JSON using your Secret Key
+3. Compare with the `sha512` value in the webhook
+
+### Webhook Response
+
+Respond with HTTP `200 OK` to acknowledge receipt. OPay retries failed webhooks for 72 hours with increasing intervals.
+
+---
+
+## Payment Methods Reference
+
+### Nigeria (NG) - NGN Currency
+
+| payMethod Value | Description |
+|-----------------|-------------|
+| BankCard | Visa/Mastercard with 3DS |
+| BankTransfer | Bank transfer to virtual account |
+| BankUssd | USSD payment |
+| BankAccount | Direct bank account debit |
+| OpayWalletNg | OPay Wallet payment |
+| OpayWalletNgQR | OPay Wallet QR code |
+| ReferenceCode | Reference code for POS/offline |
+
+### Nigeria (NG) - USD Currency
+
+| payMethod Value | Description |
+|-----------------|-------------|
+| BankCard | International cards with 3DS |
+
+---
+
+## Error Codes
+
+### OPay System Errors
+
+| Code | Message |
+|------|---------|
+| 00000 | SUCCESSFUL |
+| 02000 | Authentication failed |
+| 02001 | Request params not valid |
+| 02002 | Merchant not configured with this function |
+| 02003 | payMethod not supported |
+| 02004 | Payment reference already exists |
+| 02006 | Payment not found |
+| 02007 | Merchant not available |
+| 09 | Timeout |
+| 90 | System failure |
+| 91 | Refund error, please try again |
+| 96 | Search order error |
+| 97 | Create checkout session failed |
+| 50003 | Service not available |
+
+### Acquirer Bank Errors
+
+| Code | Message |
+|------|---------|
+| 05 | Do not honour |
+| 13 | Invalid amount |
+| 51 | Insufficient funds |
+| 54 | Expired card |
+| 57 | Transaction not permitted |
+| 62 | Restricted card |
+
+---
+
+## Test Cards (Sandbox Only)
+
+### Nigerian Cards (NGN)
+
+| Card Number | CVV | Expiry | PIN | OTP | Test Case | Status |
+|-------------|-----|--------|-----|-----|-----------|--------|
+| 5061460410121111104 | 560 | 12/50 | 1104 | 543210 | PIN | SUCCESS |
+| 5061460410121111105 | 561 | 12/50 | 1105 | 543210 | PIN+OTP | SUCCESS |
+| 5061460410121111106 | 562 | 12/50 | 1106 | 543210 | PIN+3DS | SUCCESS |
+| 5061460410121111107 | 563 | 12/50 | 1107 | 123456 | PIN | FAIL |
+
+### International Cards (USD)
+
+| Card Number | CVV | Expiry | Test Case | Status |
+|-------------|-----|--------|-----------|--------|
+| 4508750015741019 | 100 | 12/50 | 3DS | SUCCESS |
+| 5123450000000008 | 100 | 12/50 | 3DS | SUCCESS |
+| 2223000000000007 | 100 | 12/50 | 3DS | FAIL |
+
+### Test Bank Account
+
+| Bank Code | Account Number | Phone | DOB | BVN | OTP |
+|-----------|----------------|-------|-----|-----|-----|
+| 033 | 2215381184 | 0000000000 | 05-01-1990 | 123456789 | - |
+
+### Test OPay Wallet
+
+| Phone Number | PIN | OTP (Success) | OTP (Fail) |
+|--------------|-----|---------------|------------|
+| 1259257649 | 123456 | 315632 | 315633 |
+
+### Test Amounts
+
+| Payment Method | Amount (Kobo) | Result |
+|----------------|---------------|--------|
+| BankTransfer | 2300 | SUCCESS |
+| BankTransfer | 2400 | FAIL |
+| BankUssd | 1300 | SUCCESS |
+| BankUssd | 1400 | FAIL |
+
+---
+
+## Mobile SDK Integration
+
+### Android SDK
+
+**Gradle Dependency:**
+```gradle
+implementation files('libs/cashier-sdk-1.1.2.aar')
+```
+
+**Initialize:**
+```java
+// Set environment (true = sandbox, false = production)
+PaymentTask.Companion.setSandBox(true);
+```
+
+**Create Payment:**
+```java
+PayInput payInput = new PayInput(
+    "OPAYPUB123456",      // Public Key
+    "256612345678901",     // Merchant ID
+    "Merchant Name",       // Display Name
+    "order-123",           // Reference
+    "NG",                  // Country
+    10000,                 // Amount (kobos)
+    "NGN",                 // Currency
+    "Product Name",        // Product Name
+    "Description",         // Product Description
+    "https://callback.url", // Callback URL
+    "BankCard",            // Payment Method (optional)
+    30,                    // Expire At (minutes)
+    "192.168.1.1",         // User IP
+    new UserInfo("userId", "userName", "userPhone", "userEmail")
+);
+
+new PaymentTask(this).createOrder(payInput, (status, response) -> {
+    switch (status) {
+        case SUCCESS:
+            // Handle success
+            break;
+        case ERROR:
+            // Handle error
+            break;
+    }
+    return Unit.INSTANCE;
+});
+```
+
+**Handle Payment Result:**
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == PaymentTask.REQUEST_PAYMENT) {
+        if (resultCode == PaymentTask.RESULT_PAYMENT) {
+            WebJsResponse response = (WebJsResponse) data.getExtras()
+                .getSerializable(PaymentTask.RESPONSE_DATA);
+            switch (response.getOrderStatus()) {
+                case PaymentStatus.SUCCESS:
+                    // Payment successful
+                    break;
+                case PaymentStatus.FAIL:
+                    // Payment failed
+                    break;
+                case PaymentStatus.PENDING:
+                    // Payment pending
+                    break;
+            }
+        }
+    }
+}
+```
+
+**Query Order Status:**
+```java
+CashierStatusInput statusInput = new CashierStatusInput(
+    "{PublicKey}",
+    "256612345678901",
+    "order-123",
+    "",
+    "NG"
+);
+
+new PaymentTask(this).getCashierStatus(statusInput, (status, response) -> {
+    if (status == Status.SUCCESS) {
+        OrderInfo orderInfo = (OrderInfo) response.getData();
+        // Use order info
+    }
+    return null;
+});
+```
+
+---
+
+## Offline Payments API (POS)
+
+### API Basics
+
+**Base URL:** `https://payapi.opayweb.com`
+
+**Request Headers:**
+```
+clientAuthKey: {YourClientAuthKey}
+version: V1.0.1
+bodyFormat: JSON
+timestamp: {CurrentTimestampMs}
+```
+
+**Request Body (Encrypted):**
+```json
+{
+  "paramContent": "{RSA-Encrypted-JSON}",
+  "sign": "{RSA-Signature}"
+}
+```
+
+### Authentication Flow
+
+1. Encrypt request parameters using OPay's public key
+2. Append timestamp to encrypted content
+3. Sign the result with your private key
+
+### Query Balance
+
+**Endpoint:** `POST /api/v1/balance/query`
+
+**Decrypted Request:**
+```json
+{
+  "opayMerchantId": "256612345678901"
+}
+```
+
+**Decrypted Response:**
+```json
+{
+  "usableAmount": 1000000,
+  "currency": "NGN",
+  "opayAccountNo": "1234567890",
+  "queryTime": 1699000000000
+}
+```
+
+### Transaction Status Values
+
+| Status | Description |
+|--------|-------------|
+| SUCCESS | Payment successful, money credited |
+| FAIL | Payment failed |
+| CLOSE | Payment closed due to timeout |
+| CANCEL | Payment cancelled by operator |
+| PENDING | Awaiting customer payment |
+
+---
+
+## Best Practices
+
+1. **Always verify webhooks** - Check signature and call Query Status API
+2. **Handle all status values** - Implement logic for SUCCESS, FAIL, PENDING, CLOSE
+3. **Use idempotent references** - Each payment should have a unique reference
+4. **Store order numbers** - Save both your reference and OPay's orderNo
+5. **Implement retry logic** - Handle temporary failures gracefully
+6. **Test thoroughly** - Use sandbox environment with test cards
+7. **Secure your keys** - Never expose Secret Key in client-side code
+8. **Set appropriate timeouts** - Use expireAt parameter based on use case
