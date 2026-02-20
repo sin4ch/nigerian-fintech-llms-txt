@@ -2,13 +2,15 @@
 
 > Paystack is Africa's leading payments infrastructure provider, enabling businesses to accept payments from customers via cards, bank accounts, mobile money, USSD, QR codes, and bank transfers. This documentation covers integration guides, SDKs, webhooks, and best practices for building payment experiences.
 
-Paystack operates in Nigeria, Ghana, South Africa, Kenya, and Cote d'Ivoire. The platform supports both online and in-person payments through various integration methods including Popup JS, Redirect, Mobile SDKs, and Terminal devices.
+Paystack operates in Nigeria, Ghana, South Africa, Kenya, and Côte d'Ivoire. The platform supports both online and in-person payments through various integration methods including Popup JS, Redirect, Mobile SDKs, and Terminal devices.
 
-Key concepts:
-- All API requests require authentication with secret keys (server-side) or public keys (client-side)
-- Test mode allows development without real transactions using test API keys
-- Webhooks provide real-time notifications for transaction events
-- Transactions should always be verified server-side before delivering value
+Important notes:
+- All amounts are in smallest currency unit (kobo for NGN, pesewas for GHS, cents for KES/ZAR/USD)
+- API requests require authentication: secret keys (server-side) or public keys (client-side)
+- Test mode uses test API keys (`sk_test_*`, `pk_test_*`); live mode uses live keys (`sk_live_*`, `pk_live_*`)
+- Always verify transactions server-side before delivering value
+- Webhooks provide real-time notifications; validate signatures using your secret key
+- Supported currencies: NGN (Nigeria), GHS (Ghana), ZAR (South Africa), KES (Kenya), USD (International)
 
 ## Home
 
@@ -20,6 +22,7 @@ Key concepts:
 - [Accept Payments](https://paystack.com/docs/payments/accept-payments/): Integration methods including Popup JS, Redirect API, and Mobile SDKs for collecting payments
 - [Verify Payments](https://paystack.com/docs/payments/verify-payments/): How to verify transaction status and understand transaction states (success, failed, abandoned, pending)
 - [Payment Channels](https://paystack.com/docs/payments/payment-channels/): Supported payment methods including cards, mobile money, USSD, QR codes, bank transfers, and Apple Pay
+- [Apple Pay](https://paystack.com/docs/payments/apple-pay/): Setting up Apple Pay for web and Commerce Suite with domain registration and verification
 - [Recurring Charges](https://paystack.com/docs/payments/recurring-charges/): Tokenization and charging saved cards for repeat payments using authorization codes
 - [Subscriptions](https://paystack.com/docs/payments/subscriptions/): Creating plans and managing recurring subscription billing with automatic charges
 - [Split Payments](https://paystack.com/docs/payments/split-payments/): Splitting transaction settlements between main account and subaccounts
@@ -29,6 +32,23 @@ Key concepts:
 - [Refunds](https://paystack.com/docs/payments/refunds/): Initiating partial or full refunds for completed transactions
 - [Manage Disputes](https://paystack.com/docs/payments/manage-disputes/): Handling chargebacks and disputes through the Disputes API
 - [Test Payments](https://paystack.com/docs/payments/test-payments/): Test cards, bank accounts, and mobile money numbers for development
+
+## Payment Channels by Country
+
+### Nigeria (NGN)
+Cards (Visa, Mastercard, Verve), Bank Transfer, USSD, QR Code, Apple Pay
+
+### Ghana (GHS)
+Cards, Mobile Money (MTN, AirtelTigo, Telecel), Bank Transfer, QR Code
+
+### South Africa (ZAR)
+Cards, Apple Pay, QR Code
+
+### Kenya (KES)
+Cards, Mobile Money (M-PESA, Airtel Money)
+
+### Côte d'Ivoire (XOF)
+Cards, Mobile Money (MTN MoMo, Wave, Orange Money), Apple Pay
 
 ## Terminal
 
@@ -82,10 +102,24 @@ Key concepts:
 
 - [API Reference](https://paystack.com/docs/api/): Complete REST API documentation with all endpoints, parameters, and responses
 - [API Changelog](https://paystack.com/docs/changelog/api/): Latest API updates, new features, deprecations, and breaking changes
-- [Paystack CLI](https://www.npmjs.com/package/@paystack-oss/dev-cli): Command-line tool for testing webhooks and managing integrations
-- [Payslack Community](https://join.slack.com/t/payslack/shared_invite/zt-338biukg0-B1KJaBqvEtKWLp7yOUL6sA): Developer community on Slack for questions and discussions
+- [OpenAPI Specification](https://github.com/PaystackOSS/openapi): Machine-readable API spec for code generation and tooling
+- [Paystack CLI](https://github.com/PaystackOSS/paystack-cli): Command-line tool for testing webhooks and managing integrations
+- [Paystack MCP Server](https://github.com/PaystackOSS/paystack-mcp-server): Model Context Protocol server for AI assistant integration
+- [Payslack Community](https://paystack.slack.com): Developer community on Slack for questions and discussions
 - [Paystack Support](https://support.paystack.com/): Help center with FAQs and support resources
-- [PaystackOSS on GitHub](https://github.com/PaystackOSS/): Sample projects and open-source demos
+
+## Open Source Resources (PaystackOSS)
+
+- [PaystackOSS on GitHub](https://github.com/PaystackOSS/): Official open-source projects and sample code
+- [paystack-node](https://github.com/PaystackOSS/paystack-node): Official Node.js client library
+- [paystack-python](https://github.com/PaystackOSS/paystack-python): Official Python client library
+- [paystack_flutter](https://github.com/PaystackOSS/paystack_flutter): Official Flutter SDK
+- [sample-gift-store](https://github.com/PaystackOSS/sample-gift-store): Vue.js e-commerce demo with Paystack checkout
+- [sample-react](https://github.com/PaystackOSS/sample-react): React integration example
+- [sample-subscriptions-app](https://github.com/PaystackOSS/sample-subscriptions-app): Subscription billing implementation demo
+- [sample-restaurant](https://github.com/PaystackOSS/sample-restaurant): Terminal integration for in-person payments
+- [sample-logistics](https://github.com/PaystackOSS/sample-logistics): Payment on delivery with Terminal
+- [apple-pay-react](https://github.com/PaystackOSS/apple-pay-react): Apple Pay integration with React
 
 ---
 
@@ -113,6 +147,9 @@ Amount Format: All amounts are in the smallest currency unit (e.g., kobo for NGN
 
 - [API Introduction](https://paystack.com/docs/api/): Overview of Paystack API basics, base URL, and getting started
 - [Authentication](https://paystack.com/docs/api/authentication/): API key management, public vs secret keys, and authorization headers
+- [Errors](https://paystack.com/docs/api/errors/): Error types (api_error, validation_error, processor_error), codes, and handling
+- [Transaction Errors](https://paystack.com/docs/api/errors/transaction/): Common transaction failure codes and troubleshooting
+- [Pagination](https://paystack.com/docs/api/pagination/): Offset and cursor-based pagination for list endpoints
 
 ## Transactions API
 
@@ -176,6 +213,24 @@ Amount Format: All amounts are in the smallest currency unit (e.g., kobo for NGN
 - [Update Payment Page](https://paystack.com/docs/api/page/#update-payment-page): PUT /page/:id_or_slug - Update payment page details
 - [Check Slug Availability](https://paystack.com/docs/api/page/#check-slug-availability): GET /page/check_slug_availability/:slug - Check if a slug is available
 - [Add Products](https://paystack.com/docs/api/page/#add-products): POST /page/:id/product - Add products to a payment page
+
+## Products API
+
+- [Product API](https://paystack.com/docs/api/product/): Create and manage products for payment pages and storefronts
+- [Create Product](https://paystack.com/docs/api/product/#create-product): POST /product - Create a new product
+- [List Products](https://paystack.com/docs/api/product/#list-products): GET /product - Retrieve all products
+- [Fetch Product](https://paystack.com/docs/api/product/#fetch-product): GET /product/:id - Get product details
+- [Update Product](https://paystack.com/docs/api/product/#update-product): PUT /product/:id - Update product details
+- [Delete Product](https://paystack.com/docs/api/product/#delete-product): DELETE /product/:id - Remove a product
+
+## Storefront API
+
+- [Storefront API](https://paystack.com/docs/api/storefront/): Create and manage digital storefronts (paystack.shop)
+- [Create Storefront](https://paystack.com/docs/api/storefront/#create-storefront): POST /storefront - Create a new storefront with slug
+- [List Storefronts](https://paystack.com/docs/api/storefront/#list-storefronts): GET /storefront - Retrieve all storefronts
+- [Fetch Storefront](https://paystack.com/docs/api/storefront/#fetch-storefront): GET /storefront/:id - Get storefront details
+- [Update Storefront](https://paystack.com/docs/api/storefront/#update-storefront): PUT /storefront/:id - Update storefront details
+- [Delete Storefront](https://paystack.com/docs/api/storefront/#delete-storefront): DELETE /storefront/:id - Remove a storefront
 
 ## Payment Requests API
 
@@ -305,6 +360,13 @@ Amount Format: All amounts are in the smallest currency unit (e.g., kobo for NGN
 - [Resolve Account](https://paystack.com/docs/api/verification/#resolve-account): GET /bank/resolve - Confirm bank account ownership with account number and bank code
 - [Validate Account](https://paystack.com/docs/api/verification/#validate-account): POST /bank/validate - Validate account details for South African accounts
 - [Resolve Card BIN](https://paystack.com/docs/api/verification/#resolve-card-bin): GET /decision/bin/:bin - Get card information from first 6 digits
+
+## Apple Pay API
+
+- [Apple Pay API](https://paystack.com/docs/api/apple-pay/): Register and manage domains for Apple Pay transactions
+- [Register Domain](https://paystack.com/docs/api/apple-pay/#register-domain): POST /apple-pay/domain - Register a domain for Apple Pay
+- [List Domains](https://paystack.com/docs/api/apple-pay/#list-domains): GET /apple-pay/domain - List all registered Apple Pay domains
+- [Unregister Domain](https://paystack.com/docs/api/apple-pay/#unregister-domain): DELETE /apple-pay/domain - Remove a domain from Apple Pay
 
 ## Integration API
 
