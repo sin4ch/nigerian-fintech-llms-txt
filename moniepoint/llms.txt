@@ -274,22 +274,22 @@ All responses: `{ requestSuccessful: boolean, responseMessage: string, responseC
 
 ## Authentication
 
-- [Generate Access Token](https://developers.monnify.com/api#tag/authentication/post-api-v1-auth-login): POST /api/v1/auth/login — Generate Access Token. This endpoint generates an access token that would be used to authenticate all o
+- [Generate Access Token](https://developers.monnify.com/api#tag/authentication/post-api-v1-auth-login): POST /api/v1/auth/login — Generate Access Token. This endpoint generates an access token used to authenticate subsequent API requests.
 
 ## Transactions API
 
-- [Initialize Transaction](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-transactions-init-transaction): POST /api/v1/merchant/transactions/init-transaction — Initialize Transaction. This endpoint initialises the transaction that would be used for card payments a
-- [Pay With Bank Transfer](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-bank-transfer-init-payment): POST /api/v1/merchant/bank-transfer/init-payment — Pay With Bank Transfer. This endpoint generates a dynamic account number and its associated bank for one
+- [Initialize Transaction](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-transactions-init-transaction): POST /api/v1/merchant/transactions/init-transaction — Initialize Transaction. This endpoint initializes a transaction for card payments.
+- [Pay With Bank Transfer](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-bank-transfer-init-payment): POST /api/v1/merchant/bank-transfer/init-payment — Pay With Bank Transfer. This endpoint generates a dynamic account number and its associated bank for bank transfer payments.
 - [Charge a Card](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-cards-charge): POST /api/v1/merchant/cards/charge — Charge a Card. Initiate a charge on a card.
 - [Authorize OTP](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-cards-otp-authorize): POST /api/v1/merchant/cards/otp/authorize — Authorize OTP. The endpoint authorizes an OTP to complete a charge on a card.
 - [Authorize 3DS Card](https://developers.monnify.com/api#tag/transactions/post-api-v1-sdk-cards-secure-3d-authorize): POST /api/v1/sdk/cards/secure-3d/authorize — Authorize 3DS Card. This endpoint authorizes charge on a card that uses 3DS Secure Authentication.
 - [Get All Transactions](https://developers.monnify.com/api#tag/transactions/get-api-v1-transactions-search): GET /api/v1/transactions/search — Get All Transactions. This endpoint returns a list of transactions carried out on your integration.
-- [Get Transaction Status](https://developers.monnify.com/api#tag/transactions/get-api-v2-transactions-transactionReference): GET /api/v2/transactions/{transactionReference} — Get Transaction Status. This endpoint returns the status of a transaction
-- [Get Transaction Status By Reference](https://developers.monnify.com/api#tag/transactions/get-api-v2-merchant-transactions-query): GET /api/v2/merchant/transactions/query — Get Transaction Status By Reference. This endpoint returns the status of a transaction using either the Monnify trans
+- [Get Transaction Status](https://developers.monnify.com/api#tag/transactions/get-api-v2-transactions-transactionReference): GET /api/v2/transactions/{transactionReference} — Get Transaction Status. This endpoint returns the status of a transaction.
+- [Get Transaction Status By Reference](https://developers.monnify.com/api#tag/transactions/get-api-v2-merchant-transactions-query): GET /api/v2/merchant/transactions/query — Get Transaction Status By Reference. This endpoint returns the status of a transaction using either the Monnify transactionReference or your own reference.
 
 ## Disbursements API
 
-- [Initiate Transfer (Single)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single): POST /api/v2/disbursements/single — Initiate Transfer (Single). This endpoint initiats a transfer to specified bank account.
+- [Initiate Transfer (Single)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single): POST /api/v2/disbursements/single — Initiate Transfer (Single). This endpoint initiates a transfer to a specified bank account.
 - [Initiate Transfer (Bulk)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-batch): POST /api/v2/disbursements/batch — Initiate Transfer (Bulk). This endpoint allows merchant to initiate Bulk Transfer transactions.
 - [Authorize Single Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single-validate-otp): POST /api/v2/disbursements/single/validate-otp — Authorize Single Transfers. This endpoint authorizes single transfers on your integration.
 - [Authorize Bulk Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-batch-validate-otp): POST /api/v2/disbursements/batch/validate-otp — Authorize Bulk Transfers. This endpoint authorizes bulk transfers on your integration.
