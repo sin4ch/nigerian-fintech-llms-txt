@@ -258,6 +258,7 @@ The following Monnify features are NOT enabled by default and require explicit a
 - **Verification APIs (BVN/NIN):** Live environment only — not available in sandbox. Requires approval.
 - **Offline Collections (Pay-in):** Cash payments via Moniepoint agent network. Requires setup and a webhook endpoint on your side.
 
+---
 # API Reference
 
 > The Monnify REST API (Moniepoint's payment gateway). **Sandbox:** `https://sandbox.monnify.com` | **Production:** `https://api.monnify.com`
