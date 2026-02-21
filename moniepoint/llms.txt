@@ -321,7 +321,7 @@ All responses: `{ requestSuccessful: boolean, responseMessage: string, responseC
 
 ## Recurring Payments API
 
-- [Charge Card Token](https://developers.monnify.com/api#tag/recurring-payment/post-api-v1-merchant-cards-charge-card-token): POST /api/v1/merchant/cards/charge-card-token — Charge Card Token. This endpoint allows you to charge an already tokenized card with it’s card toke
+- [Charge Card Token](https://developers.monnify.com/api#tag/recurring-payment/post-api-v1-merchant-cards-charge-card-token): POST /api/v1/merchant/cards/charge-card-token — Charge Card Token. This endpoint allows you to charge an already tokenized card using its card token.
 
 ## Invoice API
 
