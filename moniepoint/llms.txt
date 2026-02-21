@@ -214,17 +214,21 @@ Mandate authorization link valid for 30 days. Status transitions: PENDING → AC
 
 Sandbox base URL: `https://sandbox.monnify.com`. Production: `https://api.monnify.com`.
 
-**Public test merchant credentials:**
-- API Key: `MK_TEST_GC3B8XG2XX`
-- Secret Key: `A663NRZA544DDPEM7KDN7Z8HRV6YXD8S`
-- Contract Code: `5867418298`
+**Sandbox merchant credentials (do not hard-code in source control):**
+- API Key: Typically starts with `MK_TEST_` and is obtained from your Monnify dashboard.
+- Secret Key: Long random string generated in your Monnify dashboard. Treat as a secret and load from environment variables (for example, `MONNIFY_SECRET_KEY`) rather than committing it.
+- Contract Code: Numeric string assigned to your contract in the Monnify dashboard (for example, a 10‑digit number).
 
-**Test cards:**
-- No OTP: `4111111111111111` exp 10/2025 CVV 1234 PIN 123
-- With OTP: `5060995994247093` exp 12/2025 CVV 1234 PIN 123
-- With 3DS: `4000000000000002` exp 12/2025 CVV 1234 PIN 123
-- Failing card: `4111111111111110`
+For up-to-date sample/test credentials and setup instructions, see the official Monnify docs: https://developers.monnify.com/
 
+**Test cards (examples only, do not store full PANs here):**
+- Monnify provides different sandbox test cards to simulate flows such as:
+  - Successful card transactions without OTP
+  - Transactions that require OTP
+  - 3-D Secure (3DS) authentication flows
+  - Declined or failing card scenarios
+
+Use only the official test card numbers from the Monnify documentation during development and testing; never use real customer card data in sandbox.
 - [Test Cards Reference](https://developers.monnify.com/docs/test-cards): Full test card list with expected flow per card
 - [Error Codes Reference](https://developers.monnify.com/docs/error-codes): All Monnify responseCode values and their meanings
 - [Supported Banks](https://developers.monnify.com/docs/supported-banks): Banks eligible for bank transfer, USSD, and direct debit
