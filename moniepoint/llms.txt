@@ -1,0 +1,424 @@
+# Moniepoint
+
+> Moniepoint Inc. is a CBN-licensed financial institution providing payment and banking services for businesses and consumers, primarily in Nigeria.
+
+Moniepoint operates as a CBN-licensed Switch, Processor, and Microfinance Bank, with its B2B payment gateway under the Monnify brand (developers.monnify.com). It supports NGN payments via cards, bank transfers, USSD, reserved virtual accounts, direct debits, and offline cash collections. API authentication is a two-step process: Basic auth (apiKey:secretKey) to obtain a Bearer JWT, then using this JWT for subsequent requests. All monetary values are in NGN kobo subunits, Moniepoint MFB deposits are NDIC-insured, and operations comply with the Nigeria Data Protection Act 2023.
+
+Important notes:
+- API authentication requires a POST /api/v1/auth/login with Basic auth (base64 of apiKey:secretKey) to get an accessToken JWT, then using "Authorization: Bearer {accessToken}" for all requests.
+- All monetary amounts in API requests and responses are specified in kobo (e.g., 10000 for NGN 100.00).
+- Always verify transaction status server-side using GET /api/v2/merchant/transactions/query?transactionReference={ref}; never rely solely on client-side callbacks or webhooks for critical logic.
+- Validate incoming webhook requests by computing a SHA-512 HMAC of the raw request body using your merchant secret key and comparing it against the 'monnify-signature' header.
+- Use `https://sandbox.monnify.com` for testing and `https://api.monnify.com` for live production API interactions.
+
+## Products
+
+- [Moniepoint Business Account](https://moniepoint.com/ng/business/business-account): Free business bank account with no hidden fees, instant verification, 24/7 support, and CBN-licensed for Nigerian businesses.
+- [Moniepoint Business Savings](https://moniepoint.com/ng/business/savings): Business savings plan with up to 17.5% interest p.a. (Fixed Deposit), minimum NGN 1,000, NDIC-secured, Halal compliant options.
+- [Moniepoint POS Terminals](https://moniepoint.com/ng/business/point-of-sale-terminal): Accepts NGN card and transfer payments with instant settlement and 99.9% reliability. Costs NGN 21,500 (caution, logistics, insurance).
+- [Moniepoint Business Expense Card](https://moniepoint.com/ng/business/expense-card): Corporate debit card for business expenses, includes transaction tracking, spending limits, and 48-hour delivery for NGN 1,500.
+- [Moniepoint Working Capital Loans](https://moniepoint.com/ng/business/working-capital-loans): Collateral-free business loans starting from NGN 1,000,000 with 24-40% p.a. interest. Approval within 24-72 hours.
+- [Moniebook](https://moniepoint.com/ng/business/moniebook): Automated bookkeeping software for inventory, sales tracking, payment processing, and financial reporting across multiple branches with cloud backup.
+- [Moniepoint Personal Account](https://moniepoint.com/ng/personal/personal-account): Personal bank account for transfers, bill payments, and financial management. Includes 48-hour debit card delivery and NGN 250,000 NDIC insurance.
+- [Moniepoint Instant Debit Card (Personal)](https://moniepoint.com/ng/personal/instant-debit-card): Physical personal debit card delivered within 48 hours. Features in-app activation/deactivation and works on ATMs and POS terminals.
+- [Moniepoint Personal Bills Payment](https://moniepoint.com/ng/personal/payment): Personal utility payment service for airtime, data, electricity, and cable TV. Includes transfers to any bank and manages refunds.
+- [Moniepoint Personal Savings](https://moniepoint.com/ng/personal/savings): Personal savings plan with up to 17.5% interest p.a. (Fixed Deposit), minimum NGN 1,000, NDIC-secured, Halal compliant options.
+- [HatchDev Software Engineering Training](https://moniepoint.com/hatchdev): 9-month software engineering training program covering Frontend, Backend, Mobile App, UI/UX, Data, and Embedded Systems/IoT development tracks.
+- [Moniepoint Business Solutions Overview](https://moniepoint.com/ng/business): Overview of Moniepoint's business solutions for Nigeria, including accounts, POS, expense cards, loans, savings, and bookkeeping tools.
+- [Moniepoint Personal Banking Overview](https://moniepoint.com/ng/personal): Overview of Moniepoint's personal banking services for Nigeria, including debit cards, bank accounts, bill payments, and savings plans.
+
+## Developer Documentation
+
+Disbursement and wallet features require approval from sales@monnify.com; verification APIs are live-only and not available in sandbox.
+
+- [Accept Payments Overview](https://developers.monnify.com/docs/collections): Integration overview for receiving NGN payments via bank transfer, debit card, USSD, and phone number. Default pay-in fee is 1.5% capped at ₦2,000.
+- [One-Time Payments](https://developers.monnify.com/docs/collections/one-time-payment): Guide for integrating Monnify Checkout JS SDK to accept one-time payments. Supports card, USSD, bank transfer, and phone number channels.
+- [Direct Debits](https://developers.monnify.com/docs/collections/direct-debits): Configuration guide for recurring 'pull' payments from bank accounts. Supports Open/Closed and Flexible/Fixed mandate types via TeamApt and NIBSS routes.
+- [Customer Reserved Accounts](https://developers.monnify.com/docs/collections/customer-reserved-account): Guide for creating dedicated virtual account numbers for customers. Ideal for automated wallet funding and utility bill collections.
+- [Monnify Invoicing](https://developers.monnify.com/docs/collections/invoice): API-based invoicing system. Supports Static Invoices (dedicated accounts per customer) and Dynamic Invoices (single-use accounts per transaction).
+- [Offline Pay-ins](https://developers.monnify.com/docs/collections/offline-payin): Mechanism for receiving cash at Moniepoint agent locations. Includes Fixed, Variable, Invoice, and Merchant Invoice product types.
+- [Recurring Payments (Tokenization)](https://developers.monnify.com/docs/collections/recurring-payments): Card tokenization guide for automated debits. Requires initial authorized transaction to generate a reusable cardToken linked to customer email.
+- [Transaction Splitting & Sub-Accounts](https://developers.monnify.com/docs/collections/transaction-splitting-sub-account): Splits individual transaction revenue across up to five sub-accounts. Configurable via incomeSplitConfig object in payment requests.
+- [Transaction Refunds](https://developers.monnify.com/docs/collections/refunds): Process for returning full or partial payments. Bank transfer refunds cost ₦10 and require a funded merchant wallet.
+- [Settlements](https://developers.monnify.com/docs/collections/settlements): Details on the settlement cycle. Transfers settle same day at 10 PM; cards and USSD settle next working day at 10 PM.
+- [Payment Links](https://developers.monnify.com/docs/collections/payment-links): No-code payment solution for individuals and SMEs to collect customer data and payments via a hosted web link.
+- [Transfers/Payouts Overview](https://developers.monnify.com/docs/disbursements): Integration guide for automated payouts from Monnify wallet to Nigerian bank accounts. Features single and bulk transfer capabilities.
+- [Single Transfers](https://developers.monnify.com/docs/disbursements/single-transfers): Guide for initiating individual bank transfers. Supports 2FA (OTP) and asynchronous processing modes.
+- [Generate Access Token](https://developers.monnify.com/api#tag/authentication): POST /api/v1/auth/login — Generates a JWT accessToken using Basic auth of apiKey:secretKey for authenticating all other API requests.
+- [Initialize Transaction](https://developers.monnify.com/api#tag/transactions): POST /api/v1/merchant/transactions/init-transaction — Initializes card and dynamic transfer payments. Returns checkout URL and transaction reference.
+- [Initiate Single Transfer](https://developers.monnify.com/api#tag/disbursements): POST /api/v2/disbursements/single — Sends funds from merchant wallet to a specified Nigerian bank account.
+- [Create Reserved Account](https://developers.monnify.com/api#tag/customer-reserved-account): POST /api/v2/bank-transfer/reserved-accounts — Generates a permanent virtual account for a customer. Requires BVN or NIN.
+- [Create Invoice](https://developers.monnify.com/api#tag/invoice): POST /api/v1/invoice/create — Generates a new invoice with a linked virtual account or checkout URL.
+- [Create Mandate](https://developers.monnify.com/api#tag/direct-debit): POST /api/v1/direct-debit/mandate/create — Initiates a direct debit mandate. Returns an authorization link for the customer.
+- [Create Sub-Account](https://developers.monnify.com/api#tag/sub-accounts): POST /api/v1/sub-accounts — Provisions a new sub-account for transaction revenue splitting.
+- [Initiate Refund](https://developers.monnify.com/api#tag/refund): POST /api/v1/refunds/initiate-refund — Triggers a full or partial reversal of a customer's payment.
+- [Validate Bank Account](https://developers.monnify.com/api#tag/verification): GET /api/v1/disbursements/account/validate — Resolves a Nigerian account number and bank code to the official account name.
+- [Process Bill Payment](https://developers.monnify.com/api#tag/bills-payment): POST /api/v1/vas/bills-payment/vend — Performs airtime top-up, data purchase, or utility bill payment vending.
+- [Get Banks](https://developers.monnify.com/api#tag/miscellaneous): GET /api/v1/banks — Returns a list of all Nigerian banks supported for transfers and dynamic account generation.
+- [Create Wallet](https://developers.monnify.com/api#tag/wallets): POST /api/v1/disbursements/wallet — Creates a sub-wallet for a customer to hold and manage funds on the merchant platform.
+- [Create Paycode](https://developers.monnify.com/api#tag/paycode): POST /api/v1/paycode — Generates an offline withdrawal code for customers to cash out at Moniepoint agents.
+
+## POS Terminal API
+
+Requires API Key-based Bearer Token. Webhook endpoints must be HTTPS and support V1_POS_TRANSACTION events.
+
+- [Authentication Introspection](https://docs.pos.moniepoint.com/#tag/authentication/get/v1/introspect): GET /v1/introspect — Verifies API key validity and retrieves associated claims including scope, business IDs, and environment (SANDBOX/PRODUCTION).
+- [Push Transaction to Terminal](https://docs.pos.moniepoint.com/#tag/transactions/post/v1/transactions): POST /v1/transactions — Triggers a payment request on a specific terminal. Requires 'transaction:push' scope and a unique merchantReference string.
+- [Query Transaction Status](https://docs.pos.moniepoint.com/#tag/transactions/get/v1/transactions/merchants/{merchantReference}): GET /v1/transactions/merchants/{merchantReference} — Retrieves the outcome of a POS payment using the merchant's unique reference. Subject to rate limiting.
+- [List Webhook Events](https://docs.pos.moniepoint.com/#tag/webhook-subscription-events/get/v1/webhook-subscription-events): GET /v1/webhook-subscription-events — Lists events for a subscription with filters for date range, eventType, and status (SUCCESS, PENDING, FAILED).
+- [Resend Webhook Event](https://docs.pos.moniepoint.com/#tag/webhook-subscription-events/post/v1/webhook-subscription-events/resend): POST /v1/webhook-subscription-events/resend — Manually triggers redelivery for events in PENDING or FAILED status. Successful events cannot be resent.
+- [Get Webhook Event Details](https://docs.pos.moniepoint.com/#tag/webhook-subscription-events/get/v1/webhook-subscription-events/{subscriptionEventId}): GET /v1/webhook-subscription-events/{subscriptionEventId} — Retrieves specific details for a single webhook event delivery attempt.
+- [Get Webhook Event Logs](https://docs.pos.moniepoint.com/#tag/webhook-subscription-events/get/v1/webhook-subscription-events/{subscriptionEventId}/logs): GET /v1/webhook-subscription-events/{subscriptionEventId}/logs — Returns delivery logs for a specific webhook event to assist in debugging integration issues.
+- [Create Webhook Subscription Group](https://docs.pos.moniepoint.com/#tag/webhook-subscription-groups/post/v1/webhook-subscription-groups): POST /v1/webhook-subscription-groups — Sets up a centralized webhook configuration to manage notifications across multiple authorized business contexts.
+- [Get Webhook Subscription Group Secret](https://docs.pos.moniepoint.com/#tag/webhook-subscription-groups/get/v1/webhook-subscription-groups/{subscriptionGroupId}/secret): GET /v1/webhook-subscription-groups/{subscriptionGroupId}/secret — Retrieves the secret key used to sign webhook payloads for verification.
+- [Regenerate Group Webhook Secret](https://docs.pos.moniepoint.com/#tag/webhook-subscription-groups/post/v1/webhook-subscription-groups/{subscriptionGroupId}/secret): POST /v1/webhook-subscription-groups/{subscriptionGroupId}/secret — Rotates the signing secret for a group. Excessive rotation is blocked by rate limiting.
+- [Configure Group Webhook Auth](https://docs.pos.moniepoint.com/#tag/webhook-subscription-groups/put/v1/webhook-subscription-groups/{subscriptionGroupId}/authentication): PUT /v1/webhook-subscription-groups/{subscriptionGroupId}/authentication — Configures delivery security using BASIC auth (username/password) or NONE.
+- [Create Webhook Subscription](https://docs.pos.moniepoint.com/#tag/webhook-subscriptions/post/v1/webhook-subscriptions): POST /v1/webhook-subscriptions — Registers a callback URL for a business to receive events like V1_POS_TRANSACTION and V1_POS_BILL_PAYMENT_TRANSACTION.
+- [Update Webhook Subscription](https://docs.pos.moniepoint.com/#tag/webhook-subscriptions/put/v1/webhook-subscriptions/{subscriptionId}): PUT /v1/webhook-subscriptions/{subscriptionId} — Modifies the callback URL, subscribed event types, or status (ENABLED/DISABLED) for a webhook.
+- [Delete Webhook Subscription](https://docs.pos.moniepoint.com/#tag/webhook-subscriptions/delete/v1/webhook-subscriptions/{subscriptionId}): DELETE /v1/webhook-subscriptions/{subscriptionId} — Permanently removes a webhook subscription from the business configuration.
+
+## Engineering Blog
+
+Technical insights into Moniepoint's infrastructure, R&D initiatives, and machine learning implementations.
+
+- [Building Trust During System Migration: How We Reached for 99.9% Data Accuracy](https://engineering.moniepoint.com/system-migration-data-accuracy): Details technical strategies and verification protocols used to achieve 99.9% data accuracy during core system migrations.
+- [Discovering Implicit Data Connections Using Self-Organising Maps](https://engineering.moniepoint.com/discovering-implicit-data-connections-using-self-organising-mapstitle): Research on applying Self-Organising Maps (SOM) to identify hidden clusters and non-linear relationships in high-dimensional financial datasets.
+- [From Requirements to Relationships: How Moniepoint Engineers are Redefining Stakeholder Engagement](https://engineering.moniepoint.com/from-requirements-to-relationships): Framework for technical stakeholder management and aligning engineering processes with business objectives in high-growth fintech.
+- [Unlocking Customer Insight: Applying Transformer Models to Unstructured Financial Text](https://engineering.moniepoint.com/applying-transformer-models-to-unstructured-financial): Technical application of Transformer NLP architectures to analyze and categorize unstructured text in financial transaction metadata.
+- [Federated Graph Neural Networks: Solving Real-Time Anomaly Detection Without Sacrificing Privacy](https://engineering.moniepoint.com/federated-graph-neural-networks): Implementation of Graph Neural Networks (GNN) and federated learning for real-time fraud detection without centralized data storage.
+- [Designing trustworthy learning systems in precision medicine and the scalability gap](https://engineering.moniepoint.com/designing-trustworthy-learning-systems): Analysis of scalability and trust requirements for machine learning systems deployed in high-precision data environments.
+
+## Blog & Updates
+
+- [Moniepoint Blog](https://moniepoint.com/blog): Index of Moniepoint's official articles on product updates, technology, and business tips across Nigeria, Kenya, and Global regions.
+- [Making the Dream: How we built the Moniepoint POS beep](https://moniepoint.com/blog/how-we-built-the-moniepoint-pos-beep): Details the technical and process journey of developing the audio feedback for Moniepoint POS terminals.
+- [Making the dream: Inside the 10-day sprint that delivered boosted rates on MonieWorld](https://moniepoint.com/blog/making-the-dream-inside-the-10-day-sprint-that-delivered-boosted-rates-on-monieworld): Describes the development sprint that led to increased interest rates for Moniepoint Business Savings (MonieWorld).
+- [Get Up to ₦1,000 Cashback Everytime You Buy Fuel with a Moniepoint Card. Starting March 1st, 2026](https://moniepoint.com/blog/get-1000naira-when-you-buy-fuel-with-moniepoint): Announces a cashback promotion for NGN 1,000 when using a Moniepoint debit card for fuel purchases in Nigeria.
+- [What Security Features Should I Look Out for in Nigerian Internet Banking Services](https://moniepoint.com/blog/security-features-in-internet-banking-in-nigeria): Discusses essential security features for Nigerian internet banking services, including Moniepoint's compliance.
+- [How to Open a Bank Account Using Only My Phone](https://moniepoint.com/blog/open-a-bank-account-using-phone-in-nigeria): Provides a guide on opening a bank account in Nigeria using only a mobile phone, referencing Moniepoint's process.
+- [Daily Limits for Banking Transactions in Nigeria: A Complete Guide (2026)](https://moniepoint.com/blog/transaction-limits-in-nigeria-2026): Explains the current daily transaction limits for banking services in Nigeria as of 2026.
+- [Product Updates | Moniepoint Blog](https://moniepoint.com/blog/categories/product-updates): Category page listing Moniepoint's product update articles, covering new features and service changes.
+- [How to Spot Bank Fraud in Nigeria (and Protect Your Money with Moniepoint)](https://moniepoint.com/blog/protect-your-money-from-fraud-in-nigeria): Offers advice on identifying bank fraud and methods for protecting funds with Moniepoint services in Nigeria.
+- [Your Debit Card Just Got an Upgrade: 5 Reasons to Switch to Moniepoint's New Debit Card](https://moniepoint.com/blog/moniepoint-card-upgrade): Highlights new features and benefits of Moniepoint's upgraded physical debit card for customers.
+- [How can I Block my ATM Card/Account with my Phone Number or a Third-party Number?](https://moniepoint.com/blog/how-to-block-your-atm-card): Instructions on blocking a Moniepoint ATM card or account via phone number or authorized third-party.
+- [Keeping USSD Reliable: Why Moniepoint Is Adding a ₦10 Transaction Fee](https://moniepoint.com/blog/moniepoint-10naira-ussd-fee): Explains the introduction of a NGN 10 transaction fee for USSD banking services to maintain reliability.
+- [Product Update: Instant Settlement Now Available on Monnify](https://moniepoint.com/blog/monnify-instant-settlement): Announces the availability of instant settlement for merchants using Monnify payment gateway services.
+- [Tech & Processes | Moniepoint Blog](https://moniepoint.com/blog/categories/tech-and-processes): Category page for Moniepoint articles focusing on engineering, system design, and operational processes.
+- [What's the point of narrations in bank transfers?](https://moniepoint.com/blog/whats-the-point-of-narrations-in-bank-transfers): Explores the importance and usage of transaction narrations for bank transfers and financial reconciliation.
+- [Making the Dream: How we built the 2025 informal economy report](https://moniepoint.com/blog/how-we-built-the-2025-informal-economy-report): Describes the process and methodology behind compiling Moniepoint's 2025 informal economy research report.
+- [Making the Dream: How we built overdraft to be a business lifeline](https://moniepoint.com/blog/making-the-dream-how-we-built-overdraft-to-be-a-business-lifeline): Details the development of Moniepoint's overdraft feature as a short-term credit solution for businesses.
+- [Behind the Tech: A day in the life of a Moniepoint debit card](https://moniepoint.com/blog/a-day-in-the-life-of-a-moniepoint-debit-card): Explains the technical journey and security measures behind daily transactions using a Moniepoint debit card.
+- [Press | Moniepoint Inc](https://moniepoint.com/press): Official press and media page providing brand resources, media contacts, and links to external news coverage about Moniepoint.
+- [Moniepoint taps Stanbic IBTC CFO for its microfinance bank after $110 million raise (Techcabal)](https://techcabal.com/2024/11/06/moniepoint-taps-stanbic-ibtc-cfo-for-mfb/): Techcabal reports on Moniepoint MFB appointing a new CFO following a $110 million funding round.
+- [Google among investors putting $110 million into Nigeria's Moniepoint (Reuters)](https://www.reuters.com/technology/google-among-investors-putting-110-million-into-nigerias-moniepoint-2024-10-29/): Reuters reports on Moniepoint's $110 million funding round, with Google listed as an investor.
+- [Nigeria-based fintech Moniepoint gains ‘unicorn’ status (Financial Times)](https://www.ft.com/content/9bc03560-a958-4afa-b535-c2cbc9d58560): Financial Times reports on Moniepoint achieving unicorn status, valued over $1 billion.
+- [FG lauds Moniepoint for boosting informal economy growth during launch of 2024 Informal Economy Report (Punch Newspapers)](https://punchng.com/fg-lauds-moniepoint-for-boosting-informal-economy-growth/#:~:text=He%20said%20that%20the%20informal,to%20the%20most%20vulnerable%20households.): Punch Newspapers covers Nigerian government's commendation of Moniepoint for its informal economy contribution.
+- [The ranking: Africa’s Fastest Growing Companies 2024 (Financial Times)](https://www.ft.com/content/a1bc5d2e-046e-499b-b27e-4d057f9d8477): Financial Times ranks Moniepoint among Africa's fastest-growing companies in 2024.
+- [LEADERSHIP Awards: Moniepoint Is Fintech Company Of The Year 2023 (Leadership Newspapers)](https://leadership.ng/leadership-awards-moniepoint-is-fintech-company-of-the-year-2023/): Leadership Newspapers awards Moniepoint as the Fintech Company of the Year for 2023.
+- ["Moniepoint's silver bullet is its people." The key ingredient to the company's success (TechPoint)](https://techpoint.africa/2024/02/22/the-key-ingredient-to-moniepoints-success/): TechPoint article on Moniepoint's company culture and human capital as a core success factor.
+- [Nigerian businesses increasingly skip traditional banks and turn to Moniepoint (Rest of World)](https://restofworld.org/2024/nigeria-fintech-moniepoint/): Rest of World reports on Nigerian businesses adopting Moniepoint over traditional banking services.
+- [FT ranking: Africa's Fastest Growing Companies 2023 (Financial Times)](https://www.ft.com/africas-fastest-growing-companies-2023): Financial Times ranks Moniepoint among Africa's fastest-growing companies in 2023.
+- [Fintech Giant – Moniepoint – Ranked Africa’s Second-fastest Growing Company by the Financial Times (Fintech Finance News)](https://ffnews.com/newsarticle/fintech/fintech-giant-moniepoint-ranked-africas-second-fastest-growing-company-by-the-financial-times/): Fintech Finance News highlights Moniepoint's ranking as Africa's second-fastest growing company by FT.
+- [Business banking fintech Moniepoint names Pawel Swiatek COO (Fintech Futures)](https://www.fintechfutures.com/2023/03/business-banking-fintech-moniepoint-names-pawel-swiatek-coo/): Fintech Futures reports on Moniepoint appointing Pawel Swiatek as its Chief Operating Officer.
+- [Championing Women in Fintech with TeamApt, Envestnet, Adsum, ForwardAI and Moneyhub (The Fintech Times)](https://thefintechtimes.com/championing-women-in-fintech-with-teamapt-envestnet-adsum-forwardai-and-moneyhub/): The Fintech Times discusses women's contributions in fintech, featuring TeamApt (Moniepoint) among others.
+- [QED makes its first African investment, backing Nigerian fintech TeamApt in $50M+ deal (TechCrunch)](https://techcrunch.com/2021/07/01/teamapt-will-use-its-new-funding-round-to-provide-digital-bank-services-for-the-unbanked/): TechCrunch reports on QED Investors' investment in TeamApt (Moniepoint) to expand digital banking for the unbanked.
+- [TeamApt Diversifies into Full Banking Services with Moniepoint App (ThisDay)](https://www.thisdaylive.com/index.php/2022/04/14/teamapt-diversifies-into-full-banking-services-with-moniepoint-app/): ThisDay reports on TeamApt's expansion into comprehensive banking services via the Moniepoint app.
+- [Africa’s tech start-up scene is maturing,” says TeamApt CEO (The Africa Report)](https://www.theafricar): The Africa Report quotes TeamApt's (Moniepoint) CEO on the growth and maturity of Africa's tech startup ecosystem.
+
+## Company
+
+- [About Moniepoint Inc. (Global)](https://moniepoint.com/about): Moniepoint Inc. (formerly TeamApt) is the parent company, processing $250B annually. Serves 20M+ accounts, 100M+ card users globally.
+- [About Moniepoint MFB (Nigeria)](https://moniepoint.com/ng/about): Moniepoint MFB is a CBN-regulated microfinance bank in Nigeria, licensed Feb 2022, serving 10M+ people and businesses with banking/credit.
+- [Moniepoint Inc. Careers (Global)](https://moniepoint.com/careers): Lists open career opportunities across various departments (e.g., Engineering, Marketing, Data Science) in Nigeria, UK, India, and Spain.
+- [Moniepoint Inc. Culture and Values](https://moniepoint.com/culture): Defines core values: Grit, Empathy, Candour, Technical Depth, No Ego, and Integrity, guiding company operations.
+
+## General
+
+Monnify API endpoints require two-step authentication: 1) POST /api/v1/auth/login with Basic auth, returns accessToken JWT. 2) Subsequent requests use Authorization: Bearer {accessToken}.
+
+- [Moniepoint Inc. Global Overview](https://moniepoint.com): Parent company offering payments, banking, business management, and credit solutions across Nigeria, Kenya, UK, US. Handles 26M daily payments.
+- [Moniepoint USSD Banking (*5573#)](https://moniepoint.com/ng/moniepoint-ussd): Offline banking via *5573# for transfers, airtime/data, balance checks, PIN reset, and account block/unblock (*5573*911#).
+- [Moniepoint Global Contact Information](https://moniepoint.com/contact): Provides office addresses and contact details for Moniepoint Inc. in Nigeria (Lagos), Kenya, UK, and US.
+- [Moniepoint Vulnerability Disclosure Policy](https://moniepoint.com/report-a-vulnerability): Guidelines for responsible reporting of security vulnerabilities in Moniepoint products/services, emphasizing ethical conduct and non-public disclosure.
+- [Moniepoint MFB Nigeria Business Banking](https://moniepoint.com/ng): Business banking solutions in Nigeria, including free business accounts, POS terminals, expense cards, working capital loans, and Moniebook, licensed by CBN.
+- [MonieWorld Referral Programme Terms](https://moniepoint.com/ng-uk-refer): Terms for earning NGN cash rewards for referring UK-domiciled invitees to MonieWorld service, subject to qualifying transfer events.
+- [Moniepoint CAC Business Name Registration](https://moniepoint.com/ng/cac-business-name-registration): Register a business name with Nigeria's Corporate Affairs Commission (CAC) via Moniepoint app for NGN 19,000, certificate in 14 days.
+- [Moniepoint CAC Business/Company Registration Overview](https://moniepoint.com/ng/cac-registration): Overview of registering business/company with Nigeria's CAC via Moniepoint app, including business name registration, with company and trustee options coming.
+- [Moniepoint Nigeria Support Center](https://moniepoint.com/ng/contact): Provides support for Nigerian customers: chat, help centre access, guides for sign-in issues, KYC verification, and compromised account reporting.
+- [Moniepoint Personal & Business Digital Banking Apps](https://moniepoint.com/ng/digital-banking): Moniepoint apps for personal banking (transfers, debit cards, savings up to 18% p.a.) and business banking (accounts, POS, instant settlement).
+- [Moniepoint MFB Integrated Management System Policy](https://moniepoint.com/ng/ims-policy): Policy statement aligning with ISO 27001:2022 (InfoSec), ISO 20000:2018 (ITSM), and ISO 22301:2019 (Business Continuity Management).
+- [Moniepoint Millionaires Season Promotion](https://moniepoint.com/ng/millionaire-season): Customer promotion offering cash prizes and a trip, requiring weekly transactions of at least NGN 1,000 and sharing a progress story video.
+- [Moniepoint Recruitment Privacy Notice](https://moniepoint.com/ng/recruitment-privacy-policy): Details how Moniepoint collects, uses, and discloses job applicant Personal Data for recruitment, adhering to Nigeria Data Protection Act 2023.
+- [Moniepoint Reward Promotion Terms & Conditions](https://moniepoint.com/ng/reward-promotion-terms-conditions): Legal terms for participating in Moniepoint reward promotions, outlining eligibility, qualifying events, and rules for receiving rewards.
+- [Moniepoint MFB Whistleblower Policy](https://moniepoint.com/ng/whistleblower-policy): Policy defining whistleblowing and providing confidential channels (hotline, email, web portal) for employees and stakeholders to report misconduct.
+- [Moniepoint UX Research Terms & Conditions](https://moniepoint.com/ux-terms-and-conditions): Terms for participating in user experience research studies, covering voluntary participation, confidentiality, and intellectual property ownership.
+- [Monnify Developer Portal Home](https://developers.monnify.com/): Main entry point for Monnify API documentation and developer resources, covering payment acceptance, transfers, wallets, and verification APIs.
+- [Monnify Bulk Transfers API](https://developers.monnify.com/docs/disbursements/bulk-transfers): POST /api/v2/disbursements/batch — Send multiple transfers to different recipients in a single API call, supporting async mode.
+- [Monnify Offline Payouts (Paycode)](https://developers.monnify.com/docs/disbursements/offline-payout): Allows recipients to cash out funds at Moniepoint agent locations using a generated paycode.
+- [Monnify Wallets API Overview](https://developers.monnify.com/docs/wallets): Overview of Monnify's wallet management APIs for creating, checking balances, and statements of sub-wallets.
+- [Monnify Create Wallet API](https://developers.monnify.com/docs/wallets/create-wallet): Create sub-wallets within a merchant's account for managing distinct fund categories or customer balances.
+- [Monnify Get Wallet Balance API](https://developers.monnify.com/docs/wallets/wallet-balance): Retrieve the current balance for a specific wallet or sub-wallet.
+- [Monnify Get Wallets API](https://developers.monnify.com/docs/wallets/get-wallets): Retrieve a list of all wallets or sub-wallets associated with a merchant account.
+- [Monnify Get Wallet Statement API](https://developers.monnify.com/docs/wallets/wallet-statement): Fetch a detailed transaction statement for a specific wallet or sub-wallet over a given period.
+- [Monnify Verification APIs Overview](https://developers.monnify.com/docs/verification-api): Overview of APIs for verifying customer identity details, including BVN, NIN, bank accounts, and phone numbers.
+- [Monnify Customer Verification](https://developers.monnify.com/docs/verification-api/verifying-your-customers): APIs for verifying BVN, NIN, and bank account details against official records to confirm customer identity.
+- [Monnify BVN/NIN Verification Guide](https://developers.monnify.com/docs/integration-guide-bvn-nin-update): Integration steps and details for verifying customer BVN and NIN (National Identification Number) with Monnify API.
+- [Monnify Bills Payment API Overview](https://developers.monnify.com/docs/bills-payment): Overview of Monnify's APIs for processing utility payments like airtime, data, electricity, and cable TV.
+- [Monnify Process Bill API](https://developers.monnify.com/docs/bills-payment/process-a-bill): Initiate and complete payments for various bills, including airtime, data, electricity, and cable TV.
+- [Monnify Bills Payment Settlement](https://developers.monnify.com/docs/bills-payment/settlement-process): Details the process for settling funds related to successful bills payment transactions.
+- [Monnify Integration Tools Overview](https://developers.monnify.com/docs/integrations-tools): Overview of various SDKs and libraries available for integrating Monnify into web and mobile applications (e.g., Web SDK, Android, iOS, Flutter, Node.js).
+
+## Optional
+
+- [Data Subject Access Request (DSAR) Form](https://moniepoint.com/dsar): Allows data subjects to submit requests for data portability, restriction, objection, access, and deletion of personal data processed by Moniepoint Inc.
+- [Nigeria Privacy Policy (Moniepoint MFB)](https://moniepoint.com/ng/privacy-policy): Details Moniepoint MFB's data protection practices in Nigeria, compliant with Nigeria Data Protection Act 2023 for personal data processing.
+- [Nigeria Terms and Conditions (Moniepoint MFB)](https://moniepoint.com/ng/terms-and-conditions): Outlines contractual terms for Moniepoint MFB banking relationships, covering account opening, KYC requirements, service definitions, and user obligations.
+- [Nigeria Cookie Policy (Moniepoint MFB)](https://moniepoint.com/ng/cookie-policy): Explains Moniepoint MFB's use of cookies (Session, Persistent, Necessary, Performance, Advertising) and how users can manage their preferences.
+- [Global Privacy Policy (Moniepoint Inc)](https://moniepoint.com/privacy-policy): Details Moniepoint Inc.'s global data protection practices, lawful bases for processing, and types of personal data collected (e.g., BVN, NIN).
+- [Support: Account Opening and KYC](https://support.moniepoint.com/topics/account-opening-and-kyc-235): Knowledge base articles for Moniepoint account opening and Know Your Customer (KYC) verification inquiries.
+- [Support: Account Information and Updates](https://support.moniepoint.com/topics/account-information-and-updates-234): Knowledge base articles for Moniepoint account statements, information updates, and account closure procedures.
+- [Support: Transfers](https://support.moniepoint.com/topics/transfers-233): Knowledge base articles addressing common inquiries and issues related to Moniepoint funds transfers.
+- [Support: VAS Payments](https://support.moniepoint.com/topics/vas-payments-232): Knowledge base articles for inquiries regarding Moniepoint Value Added Service (VAS) payments, e.g., bills, airtime.
+- [Support: Sales Network](https://support.moniepoint.com/topics/sales-network-230): Knowledge base articles for Moniepoint sales network and agent-related inquiries, including agent onboarding and operations.
+- [Support: USSD](https://support.moniepoint.com/topics/ussd-229): Knowledge base articles for Moniepoint USSD banking (*5573#) related inquiries and transaction guidance.
+- [Support: Account Login and Security](https://support.moniepoint.com/topics/account-login-and-security-228): Knowledge base articles for Moniepoint account login issues, password resets, and security best practices.
+- [Support: POS Terminals](https://support.moniepoint.com/topics/pos-terminals-226): Knowledge base articles for Moniepoint POS terminal setup, usage, troubleshooting, and instant settlement details.
+- [Support: Loans](https://support.moniepoint.com/topics/loans-225): Knowledge base articles for Moniepoint working capital loans, application process, and repayment terms.
+- [Support: Fraud](https://support.moniepoint.com/topics/fraud-224): Knowledge base articles addressing fraud prevention, reporting suspicious activities, and securing Moniepoint accounts.
+- [Support: Cards](https://support.moniepoint.com/topics/cards-223): Knowledge base articles for Moniepoint debit cards, expense cards, card issuance, and transaction issues.
+- [Support: Account Restrictions](https://support.moniepoint.com/topics/account-restrictions-222): Knowledge base articles for reasons behind Moniepoint account restrictions and procedures for resolution.
+- [Support: Savings](https://support.moniepoint.com/topics/savings-198): Knowledge base articles for Moniepoint Business Savings and Personal Savings accounts, including interest rates.
+
+## Payment Channels
+
+Monnify supports multiple payment channels per transaction. The customer selects their preferred channel at checkout.
+
+**Cards:** Visa, Mastercard, Verve. Supports PIN entry, OTP (2FA), and 3DS flows. Test cards available in sandbox.
+**Bank Transfer:** Monnify generates a dynamic virtual account number per transaction. Customer transfers exact amount → webhook fires on receipt.
+**USSD:** Customer dials their bank's USSD shortcode and enters the transaction amount. No internet required on customer side.
+**Reserved Virtual Account:** Permanent virtual account assigned to a specific customer for all-time reconciliation. Payments credited instantly.
+**Direct Debit:** Mandate-based recurring pulls from customer bank account. Routes via TeamApt or NIBSS. Requires mandate authorization link sent to customer.
+**Offline Pay-in:** Customer pays cash at any Moniepoint agent (present in every LGA in Nigeria). Merchant gets SUCCESSFUL_TRANSACTION webhook with paymentMethod: "CASH".
+**Payment Links:** No-code hosted payment pages. Create via dashboard or POST /api/v1/invoice/create.
+
+### Direct Debit Mandate Types
+
+- **Open Flexible** — varying amounts, no end date (e.g. utility billing based on usage)
+- **Open Fixed** — fixed amount, no end date (e.g. streaming subscription)
+- **Closed Flexible** — varying amounts with end date (e.g. instalment plan)
+- **Closed Fixed** — fixed amount with end date (e.g. insurance premiums)
+
+Mandate authorization link valid for 30 days. Status transitions: PENDING → ACTIVATED / FAILED / CANCELLED.
+
+## Test Credentials
+
+Sandbox base URL: `https://sandbox.monnify.com`. Production: `https://api.monnify.com`.
+
+**Public test merchant credentials:**
+- API Key: `MK_TEST_GC3B8XG2XX`
+- Secret Key: `A663NRZA544DDPEM7KDN7Z8HRV6YXD8S`
+- Contract Code: `5867418298`
+
+**Test cards:**
+- No OTP: `4111111111111111` exp 10/2025 CVV 1234 PIN 123
+- With OTP: `5060995994247093` exp 12/2025 CVV 1234 PIN 123
+- With 3DS: `4000000000000002` exp 12/2025 CVV 1234 PIN 123
+- Failing card: `4111111111111110`
+
+- [Test Cards Reference](https://developers.monnify.com/docs/test-cards): Full test card list with expected flow per card
+- [Error Codes Reference](https://developers.monnify.com/docs/error-codes): All Monnify responseCode values and their meanings
+- [Supported Banks](https://developers.monnify.com/docs/supported-banks): Banks eligible for bank transfer, USSD, and direct debit
+
+## SDKs & Libraries
+
+- [Web SDK (MonnifySDK)](https://developers.monnify.com/docs/integration-tools/sdk): JS checkout popup — call `MonnifySDK.initialize()` with apiKey, amount, customerEmail, paymentDescription
+- [Android SDK](https://developers.monnify.com/docs/integration-tools/sdk#android): Native Android payment UI — card, bank transfer, USSD on Android
+- [iOS SDK](https://developers.monnify.com/docs/integration-tools/sdk#ios): Native iOS payment UI — Swift/Objective-C support
+- [Flutter SDK](https://developers.monnify.com/docs/integration-tools/sdk#flutter): Cross-platform mobile SDK — pub.dev: monnify_flutter
+- [React wrapper](https://developers.monnify.com/docs/integration-tools/plugin-libraries): npm install monnify-payment-lib — wraps MonnifySDK for React apps
+- [Node.js library](https://developers.monnify.com/docs/integration-tools/plugin-libraries#node): monnify-node — server-side helper for auth, collections, disbursements
+- [PHP library](https://developers.monnify.com/docs/integration-tools/plugin-libraries#php): Composer package for PHP integrations
+- [Python library](https://developers.monnify.com/docs/integration-tools/plugin-libraries#python): pip install monnify
+- [WooCommerce plugin](https://developers.monnify.com/docs/integration-tools/plugin-libraries#woocommerce): WordPress/WooCommerce payment gateway plugin
+- [WHMCS plugin](https://developers.monnify.com/docs/integration-tools/plugin-libraries#whmcs): Monnify payment gateway module for WHMCS billing
+- [Sample codes](https://developers.monnify.com/docs/integration-tools/sample-codes): Code samples for initialize transaction, verify, webhook handling in multiple languages
+
+## Features Requiring Approval
+
+The following Monnify features are NOT enabled by default and require explicit approval:
+
+- **Disbursements (Transfers):** Regulatory requirement. Contact sales@monnify.com. Required for single and bulk transfer endpoints.
+- **Sub-accounts:** Enables transaction splitting. Contact your relationship manager at sales@monnify.com.
+- **Wallets (Sub-wallets):** Virtual wallet creation per customer. Requires RM approval.
+- **Bills Payment:** Airtime, data, electricity, cable TV. Request via integration-support@monnify.com.
+- **Verification APIs (BVN/NIN):** Live environment only — not available in sandbox. Requires approval.
+- **Offline Collections (Pay-in):** Cash payments via Moniepoint agent network. Requires setup and a webhook endpoint on your side.
+
+# API Reference
+
+> The Monnify REST API (Moniepoint's payment gateway). **Sandbox:** `https://sandbox.monnify.com` | **Production:** `https://api.monnify.com`
+
+Auth: POST `/api/v1/auth/login` with `Authorization: Basic base64(apiKey:secretKey)` → returns `accessToken` JWT. Use `Authorization: Bearer {accessToken}` on all subsequent calls. Token expires — re-authenticate proactively.
+
+All responses: `{ requestSuccessful: boolean, responseMessage: string, responseCode: string, responseBody: object }`. Amounts in **kobo** (NGN). Always verify transactions server-side before delivering value — never trust client callbacks alone.
+
+- [Interactive API Explorer](https://developers.monnify.com/api): Scalar-powered reference with live endpoint testing against sandbox
+- [OpenAPI Spec (YAML)](https://developers.monnify.com/collection/monnify-collection.yml): Machine-readable OpenAPI 3.0 spec for code generation and tooling
+- [API Status](https://monnify.statuspage.io/): Real-time Monnify API uptime and incident history
+- [Change Log](https://developers.monnify.com/docs/change-logs): API versioning history, new endpoints, deprecations
+
+## Authentication
+
+- [Generate Access Token](https://developers.monnify.com/api#tag/authentication/post-api-v1-auth-login): POST /api/v1/auth/login — Generate Access Token. This endpoint generates an access token that would be used to authenticate all o
+
+## Transactions API
+
+- [Initialize Transaction](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-transactions-init-transaction): POST /api/v1/merchant/transactions/init-transaction — Initialize Transaction. This endpoint initialises the transaction that would be used for card payments a
+- [Pay With Bank Transfer](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-bank-transfer-init-payment): POST /api/v1/merchant/bank-transfer/init-payment — Pay With Bank Transfer. This endpoint generates a dynamic account number and its associated bank for one
+- [Charge a Card](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-cards-charge): POST /api/v1/merchant/cards/charge — Charge a Card. Initiate a charge on a card.
+- [Authorize OTP](https://developers.monnify.com/api#tag/transactions/post-api-v1-merchant-cards-otp-authorize): POST /api/v1/merchant/cards/otp/authorize — Authorize OTP. The endpoint authorizes an OTP to complete a charge on a card.
+- [Authorize 3DS Card](https://developers.monnify.com/api#tag/transactions/post-api-v1-sdk-cards-secure-3d-authorize): POST /api/v1/sdk/cards/secure-3d/authorize — Authorize 3DS Card. This endpoint authorizes charge on a card that uses 3DS Secure Authentication.
+- [Get All Transactions](https://developers.monnify.com/api#tag/transactions/get-api-v1-transactions-search): GET /api/v1/transactions/search — Get All Transactions. This endpoint returns a list of transactions carried out on your integration.
+- [Get Transaction Status](https://developers.monnify.com/api#tag/transactions/get-api-v2-transactions-transactionReference): GET /api/v2/transactions/{transactionReference} — Get Transaction Status. This endpoint returns the status of a transaction
+- [Get Transaction Status By Reference](https://developers.monnify.com/api#tag/transactions/get-api-v2-merchant-transactions-query): GET /api/v2/merchant/transactions/query — Get Transaction Status By Reference. This endpoint returns the status of a transaction using either the Monnify trans
+
+## Disbursements API
+
+- [Initiate Transfer (Single)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single): POST /api/v2/disbursements/single — Initiate Transfer (Single). This endpoint initiats a transfer to specified bank account.
+- [Initiate Transfer (Bulk)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-batch): POST /api/v2/disbursements/batch — Initiate Transfer (Bulk). This endpoint allows merchant to initiate Bulk Transfer transactions.
+- [Authorize Single Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single-validate-otp): POST /api/v2/disbursements/single/validate-otp — Authorize Single Transfers. This endpoint authorizes single transfers on your integration.
+- [Authorize Bulk Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-batch-validate-otp): POST /api/v2/disbursements/batch/validate-otp — Authorize Bulk Transfers. This endpoint authorizes bulk transfers on your integration.
+- [Resend OTP (Single)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-single-resend-otp): POST /api/v2/disbursements/single/resend-otp — Resend OTP (Single). This endpoint generates a new OTP in the event that there were challenges with t
+- [Resend OTP (Bulk)](https://developers.monnify.com/api#tag/transfers-(disbursement)/post-api-v2-disbursements-batch-resend-otp): POST /api/v2/disbursements/batch/resend-otp — Resend OTP (Bulk). This endpoint generates a new OTP in the event that there were         challenge
+- [Single Transfer Status](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-single-summary): GET /api/v2/disbursements/single/summary — Single Transfer Status. This endpoint verifies the status of a single transfer on your integration.
+- [List All Single Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-single-transactions): GET /api/v2/disbursements/single/transactions — List All Single Transfers. This endpoint returns the list of all single transfers made on your integration.
+- [List All Bulk Transfers](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-bulk-transactions): GET /api/v2/disbursements/bulk/transactions — List All Bulk Transfers. This endpoint returns the list of all bulk transfers made on your integration.
+- [Bulk Transfer Status](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-bulk-batchreference--12934-transactions): GET /api/v2/disbursements/bulk/batchreference--12934/transactions — Bulk Transfer Status. This endpoint verifies the status of a bulk transfer on your integrati
+- [Bulk Batch Summary](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-batch-summary): GET /api/v2/disbursements/batch/summary — Bulk Batch Summary. This endpoint provides the summary of a completed batch transaction.
+- [Search Disbursement Transactions](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-search-transactions): GET /api/v2/disbursements/search-transactions — Search Disbursement Transactions. This endpoint returns the list of all disbursement transactions.
+- [Get Wallet Balance](https://developers.monnify.com/api#tag/transfers-(disbursement)/get-api-v2-disbursements-wallet-balance): GET /api/v2/disbursements/wallet-balance — Get Wallet Balance. This endpoint returns the available balance in your monnify wallet.
+
+## Reserved Accounts API
+
+- [Create Reserved Account(General)](https://developers.monnify.com/api#tag/customer-reserved-account/post-api-v2-bank-transfer-reserved-accounts): POST /api/v2/bank-transfer/reserved-accounts — Create Reserved Account(General). This endpoint allows the creation of dedicated virtual accounts for your custom
+- [Create Reserved Account(Invoice)](https://developers.monnify.com/api#tag/customer-reserved-account/post-api-v1-bank-transfer-reserved-accounts): POST /api/v1/bank-transfer/reserved-accounts — Create Reserved Account(Invoice). This endpoint allows the creation of an invoiced reserved account.
+- [Get Reserved Account Details](https://developers.monnify.com/api#tag/customer-reserved-account/get-api-v2-bank-transfer-reserved-accounts-accountReference): GET /api/v2/bank-transfer/reserved-accounts/{accountReference} — Get Reserved Account Details. This endpoint returns details of an account reserved for a custom
+- [Add Linked Accounts](https://developers.monnify.com/api#tag/customer-reserved-account/put-api-v1-bank-transfer-reserved-accounts-add-linked-accounts-accountReference): PUT /api/v1/bank-transfer/reserved-accounts/add-linked-accounts/{accountReference} — Add Linked Accounts. This endpoint links accounts with another partner bank
+- [Update BVN for a Reserve Account](https://developers.monnify.com/api#tag/customer-reserved-account/put-api-v1-bank-transfer-reserved-accounts-update-customer-bvn-reservedAccountReference): PUT /api/v1/bank-transfer/reserved-accounts/update-customer-bvn/{reservedAccountReference} — Update BVN for a Reserve Account. This endpoint updates BVN of cust
+- [Allowed Payment Source(s)](https://developers.monnify.com/api#tag/customer-reserved-account/put-api-v1-bank-transfer-reserved-accounts-update-payment-source-filter-accountReference): PUT /api/v1/bank-transfer/reserved-accounts/update-payment-source-filter/{accountReference} — Allowed Payment Source(s). This endpoint manages accounts that can
+- [Updating Split Config for Reserved Account](https://developers.monnify.com/api#tag/customer-reserved-account/put-api-v1-bank-transfer-reserved-accounts-update-income-split-config-accountReference): PUT /api/v1/bank-transfer/reserved-accounts/update-income-split-config/{accountReference} — Updating Split Config for Reserved Account. This endpoint updates th
+- [Deallocating a reserved account](https://developers.monnify.com/api#tag/customer-reserved-account/delete-api-v1-bank-transfer-reserved-accounts-reference-accountReference): DELETE /api/v1/bank-transfer/reserved-accounts/reference/{accountReference} — Deallocating a reserved account. This endpoint allows you to deallocate/delete alr
+- [Get Reserved Account Transactions](https://developers.monnify.com/api#tag/customer-reserved-account/get-api-v1-bank-transfer-reserved-accounts-transactions): GET /api/v1/bank-transfer/reserved-accounts/transactions — Get Reserved Account Transactions. This endpoint returns the list of all transactions done on a reser
+- [Update KYC Info](https://developers.monnify.com/api#tag/customer-reserved-account/put-api-v1-bank-transfer-reserved-accounts-accountReference-kyc-info): PUT /api/v1/bank-transfer/reserved-accounts/{accountReference}/kyc-info — Update KYC Info. This endpoint links customers' BVN/NIN to their respective reserved a
+
+## Direct Debit API
+
+- [Create Mandate](https://developers.monnify.com/api#tag/direct-debit/post-api-v1-direct-debit-mandate-create): POST /api/v1/direct-debit/mandate/create — Create Mandate. This endpoint initiates the creation of a mandate.
+- [Get Mandate Status](https://developers.monnify.com/api#tag/direct-debit/get-api-v1-direct-debit-mandate-): GET /api/v1/direct-debit/mandate/ — Get Mandate Status. This endpoint retrieves the details of a created mandate.
+- [Debit Mandate](https://developers.monnify.com/api#tag/direct-debit/post-api-v1-direct-debit-mandate-debit): POST /api/v1/direct-debit/mandate/debit — Debit Mandate. This endpoint debits an active mandate.
+- [Get Debit Status](https://developers.monnify.com/api#tag/direct-debit/get-api-v1-direct-debit-mandate-debit-status): GET /api/v1/direct-debit/mandate/debit-status — Get Debit Status. This endpoint gets the status of a debited mandate.
+- [Update Mandate (Cancel Mandate)](https://developers.monnify.com/api#tag/direct-debit/patch-api-v1-direct-debit-mandate-cancel-mandate-mandateCode): PATCH /api/v1/direct-debit/mandate/cancel-mandate/{mandateCode} — Update Mandate (Cancel Mandate). This endpoint cancels/deactivates a mandate.
+
+## Recurring Payments API
+
+- [Charge Card Token](https://developers.monnify.com/api#tag/recurring-payment/post-api-v1-merchant-cards-charge-card-token): POST /api/v1/merchant/cards/charge-card-token — Charge Card Token. This endpoint allows you to charge an already tokenized card with it’s card toke
+
+## Invoice API
+
+- [Create an Invoice](https://developers.monnify.com/api#tag/invoice/post-api-v1-invoice-create): POST /api/v1/invoice/create — Create an Invoice. This endpoint enables merchant to create an invoice.
+- [View Invoice Details](https://developers.monnify.com/api#tag/invoice/get-api-v1-invoice-invoiceReference-details): GET /api/v1/invoice/{invoiceReference}/details — View Invoice Details. This endpoint returns details of an invoice on your integration.
+- [Get All Invoices](https://developers.monnify.com/api#tag/invoice/get-api-v1-invoice-all): GET /api/v1/invoice/all — Get All Invoices. This endpoint returns the list of all the invoice available on your integration.
+- [Cancel an Invoice](https://developers.monnify.com/api#tag/invoice/delete-api-v1-invoice-invoiceReference-cancel): DELETE /api/v1/invoice/{invoiceReference}/cancel — Cancel an Invoice. This endpoint cancels an Invoice on your integration.
+
+## Wallets API
+
+- [Get Wallets](https://developers.monnify.com/api#tag/wallet/get-api-v1-disbursements-wallet): GET /api/v1/disbursements/wallet — Get Wallets. This endpoint returns all the wallets created by a merchant
+- [Create Wallet](https://developers.monnify.com/api#tag/wallet/post-api-v1-disbursements-wallet): POST /api/v1/disbursements/wallet — Create Wallet. This endpoint enables a merchant to creates wallets for their customers
+- [Wallet Balance](https://developers.monnify.com/api#tag/wallet/get-api-v1-disbursements-wallet-balance): GET /api/v1/disbursements/wallet/balance — Wallet Balance. This endpoint returns the balance associated with a wallet
+- [Wallet Transactions](https://developers.monnify.com/api#tag/wallet/get-api-v1-disbursements-wallet-transactions): GET /api/v1/disbursements/wallet/transactions — Wallet Transactions. This endpoint returns all the transactions performed by a wallet
+
+## Sub-Accounts API
+
+This collection enables merchants to create and manage sub accounts on an integration.
+
+- [Get Sub Accounts](https://developers.monnify.com/api#tag/sub-accounts/get-api-v1-sub-accounts): GET /api/v1/sub-accounts — Get Sub Accounts. This endpoint returns the list of sub accounts that have been created on your in
+- [Create Sub Account(s)](https://developers.monnify.com/api#tag/sub-accounts/post-api-v1-sub-accounts): POST /api/v1/sub-accounts — Create Sub Account(s). This endpoint allows you to create a sub account to enable the spliting of payme
+- [Update Sub Account](https://developers.monnify.com/api#tag/sub-accounts/put-api-v1-sub-accounts): PUT /api/v1/sub-accounts — Update Sub Account. This endpoint updates the details of an existing sub account.
+- [Delete Sub Account](https://developers.monnify.com/api#tag/sub-accounts/delete-api-v1-sub-accounts-subAccountCode): DELETE /api/v1/sub-accounts/{subAccountCode} — Delete Sub Account. This endpoint deletes a sub account on your integration.
+
+## Limit Profiles API
+
+- [Get Limit Profiles](https://developers.monnify.com/api#tag/limit-profile/get-api-v1-limit-profile-): GET /api/v1/limit-profile/ — Get Limit Profiles. This endpoint returns the list of all Limit Profiles that have been created for 
+- [Create Limit Profile(s)](https://developers.monnify.com/api#tag/limit-profile/post-api-v1-limit-profile-): POST /api/v1/limit-profile/ — Create Limit Profile(s). This endpoint creates limit profiles on a customer's account.
+- [Update Limit Profile](https://developers.monnify.com/api#tag/limit-profile/put-api-v1-limit-profile-FSYVVWU8UPBD): PUT /api/v1/limit-profile/FSYVVWU8UPBD — Update Limit Profile. This endpoint updates the information on an existing Limit Profile.
+- [Reserve Account with Limit](https://developers.monnify.com/api#tag/limit-profile/post-api-v1-bank-transfer-reserved-accounts-limit): POST /api/v1/bank-transfer/reserved-accounts/limit — Reserve Account with Limit. This endpoint reserves an account for your customers with a transaction limit p
+- [Update Reserve Account Limit](https://developers.monnify.com/api#tag/limit-profile/put-api-v1-bank-transfer-reserved-accounts-limit): PUT /api/v1/bank-transfer/reserved-accounts/limit — Update Reserve Account Limit. This endpoint updates the information on an existing Limit Profile for a Reser
+
+## Refunds API
+
+- [Initiate Refund](https://developers.monnify.com/api#tag/refund/post-api-v1-refunds-initiate-refund): POST /api/v1/refunds/initiate-refund — Initiate Refund. This endpoint allows you to Initiate a refund.
+- [Get Refund Status](https://developers.monnify.com/api#tag/refund/get-api-v1-refunds-202100op3456): GET /api/v1/refunds/202100op3456 — Get Refund Status. This endpoint returns the status of an initiated refund.
+- [Get All Refunds](https://developers.monnify.com/api#tag/refund/get-api-v1-refunds): GET /api/v1/refunds — Get All Refunds. This endpoint returns the list of all refunds available on your integration.
+
+## Settlements API
+
+- [Get Transactions By Settlement Reference](https://developers.monnify.com/api#tag/settlements/get-api-v1-transactions-find-by-settlement-reference): GET /api/v1/transactions/find-by-settlement-reference — Get Transactions By Settlement Reference. This endpoint returns all transactions that made up a settleme
+- [Get Settlement Information for Transaction](https://developers.monnify.com/api#tag/settlements/get-api-v1-settlement-detail): GET /api/v1/settlement-detail — Get Settlement Information for Transaction. This endpoint returns settlement information on transactions made to your settle
+
+## Verification API
+
+This collection enables merchants to verify the identifies of their customers
+
+  Please note that API category can only be used in Live environment.
+
+- [Validate Bank Account](https://developers.monnify.com/api#tag/verification-apis/get-api-v1-disbursements-account-validate): GET /api/v1/disbursements/account/validate — Validate Bank Account. This endpoint validates a Customer's NUBAN Account.
+- [BVN Information Verification](https://developers.monnify.com/api#tag/verification-apis/post-api-v1-vas-bvn-details-match): POST /api/v1/vas/bvn-details-match — BVN Information Verification. This endpoint verifies the BVN information of your customers.
+- [BVN and Account Name Match](https://developers.monnify.com/api#tag/verification-apis/post-api-v1-vas-bvn-account-match): POST /api/v1/vas/bvn-account-match — BVN and Account Name Match. This endpoint verifies that the Bank verification number and the account number 
+- [NIN Verification](https://developers.monnify.com/api#tag/verification-apis/post-api-v1-vas-nin-details): POST /api/v1/vas/nin-details — NIN Verification. This endpoint verifies the supplied NIN of the customer.
+
+## Bills Payment API
+
+API for integrating with the Bills Payment service. This documentation provides a detailed overview of the available endpoints, including examples for requests and responses.
+
+- [Get Biller Categories](https://developers.monnify.com/api#tag/bills-payment-apis/get-api-v1-vas-bills-payment-biller-categories): GET /api/v1/vas/bills-payment/biller-categories — Get Biller Categories. Retrieves a paginated list of all available biller categories, such as transport
+- [List Billers](https://developers.monnify.com/api#tag/bills-payment-apis/get-api-v1-vas-bills-payment-billers): GET /api/v1/vas/bills-payment/billers — List Billers. Retrieves a paginated list of all billers. You can optionally filter the list by
+- [Get Biller Products](https://developers.monnify.com/api#tag/bills-payment-apis/get-api-v1-vas-bills-payment-biller-products): GET /api/v1/vas/bills-payment/biller-products — Get Biller Products. Retrieves a paginated list of products available for a specific biller by passin
+- [Process Bill Payment](https://developers.monnify.com/api#tag/bills-payment-apis/post-api-v1-vas-bills-payment-vend): POST /api/v1/vas/bills-payment/vend — Process Bill Payment. Initiates a payment or vending transaction for a specific product, such as airti
+- [Check Bill Payment Status](https://developers.monnify.com/api#tag/bills-payment-apis/get-api-v1-vas-bills-payment-requery): GET /api/v1/vas/bills-payment/requery — Check Bill Payment Status. Checks and retrieves the final status of a previously initiated transaction usin
+- [Validate Customer](https://developers.monnify.com/api#tag/bills-payment-apis/post-api-v1-vas-bills-payment-validate-customer): POST /api/v1/vas/bills-payment/validate-customer — Validate Customer. Validates a customer's details (like a meter number or phone number) for a speci
+
+## Paycode API
+
+- [Fetch Paycodes](https://developers.monnify.com/api#tag/paycode-api/get-api-v1-paycode): GET /api/v1/paycode — Fetch Paycodes. This endpoint returns a history of generated Paycodes over a period of time usin
+- [Create Paycode](https://developers.monnify.com/api#tag/paycode-api/post-api-v1-paycode): POST /api/v1/paycode — Create Paycode. The endpoint allows merchant create paycodes via API.
+- [Get Paycode](https://developers.monnify.com/api#tag/paycode-api/get-api-v1-paycode-paycodeReference): GET /api/v1/paycode/{paycodeReference} — Get Paycode. This endpoint returns paycode information for a given paycode reference.
+- [Delete Paycode](https://developers.monnify.com/api#tag/paycode-api/delete-api-v1-paycode-paycodeReference): DELETE /api/v1/paycode/{paycodeReference} — Delete Paycode. This endpoint cancels or invalidates a generated Paycode.
+- [Get Clear Paycode](https://developers.monnify.com/api#tag/paycode-api/get-api-v1-paycode-paycodeReference-authorize): GET /api/v1/paycode/{paycodeReference}/authorize — Get Clear Paycode. This endpoint is used to get an unmasked paycode information.
+
+## Miscellaneous API
+
+- [Get Banks](https://developers.monnify.com/api#tag/others/get-api-v1-banks): GET /api/v1/banks — Get Banks. This endpoint returns a list of all banks supported by Monnify for collections a
+- [Get Banks With USSD Short Code](https://developers.monnify.com/api#tag/others/get-api-v1-sdk-transactions-banks): GET /api/v1/sdk/transactions/banks — Get Banks With USSD Short Code. This endpoint returns the list of all supported banks with their valid USSD shor
+
+## Webhooks
+
+Configure webhook URLs in Monnify dashboard → Developer → Webhook URLs. Set separate URLs for: Transaction Completion, Refund Completion, Disbursement, Settlement.
+
+**Signature validation (mandatory):** Compute SHA-512 HMAC of the raw JSON request body using your merchant secret key. Compare to the hash in the `monnify-signature` request header. Reject any request where hashes don't match.
+
+**Best practices:** Respond HTTP 200 immediately, process async. Handle duplicate deliveries idempotently. Whitelist Monnify IP ranges. Retry logic is built into Monnify — don't manually retry on your side.
+
+- [Webhooks Setup Guide](https://developers.monnify.com/docs/webhooks): Dashboard configuration, IP whitelisting, best practices
+- [Webhook Event Types](https://developers.monnify.com/docs/webhooks/event-types): Full payload schema for each event with example JSON
+
+**Supported events:**
+- `SUCCESSFUL_TRANSACTION` — payment received; includes transactionReference, amount, paymentMethod, paidOn
+- `FAILED_TRANSACTION` — payment attempt failed; includes failure reason
+- `SUCCESSFUL_DISBURSEMENT` — transfer completed; includes amount, reference, destinationAccountNumber, sessionId
+- `FAILED_DISBURSEMENT` — transfer failed; includes failure reason in transactionDescription
+- `REVERSED_DISBURSEMENT` — transfer reversed after posting (status: REVERSED)
+- `SUCCESSFUL_REFUND` — refund processed to customer
+- `FAILED_REFUND` — refund processing failed
+- `SETTLEMENT_COMPLETION` — merchant settlement paid to registered bank account
+- `MANDATE_STATUS_CHANGE` — direct debit mandate changed: PENDING→ACTIVATED/FAILED/CANCELLED
+- `WALLET_CREDIT` / `WALLET_DEBIT` — sub-wallet balance changes
